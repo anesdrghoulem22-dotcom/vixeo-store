@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إعدادات الحساب — دكان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="dash-shell grid md:grid-cols-[240px_1fr]">
+
+  <aside class="dash-sidebar p-5 flex md:flex-col gap-2 md:min-h-screen">
+    <div class="hidden md:flex items-center gap-3 mb-8">
+      <span class="brand-mark">د</span>
+      <span class="font-display text-lg">دكان</span>
+    </div>
+    <a href="dashboard.html" class="dash-tab">📦 منتجاتي</a>
+    <a href="dashboard.html" class="dash-tab">🧾 الطلبات</a>
+    <a id="viewStoreLink" href="#" class="dash-tab" target="_blank">🏬 عرض متجري</a>
+    <span class="dash-tab is-active">⚙️ إعدادات الحساب</span>
+    <button id="logoutBtn" class="dash-tab mt-auto" style="color: var(--c-danger)">↩ تسجيل الخروج</button>
+  </aside>
+
+  <main class="p-5 md:p-9 max-w-2xl">
+    <div class="flex items-center gap-3 mb-8">
+      <div class="avatar-circle" id="sellerAvatar">د</div>
+      <div>
+        <p class="text-sm text-gray-500">إعدادات حساب</p>
+        <h1 class="font-display text-xl" id="sellerName">—</h1>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h2 class="font-display text-lg mb-5">الملف الشخصي</h2>
+      <form id="profileForm" class="space-y-4">
+        <div class="avatar-upload-row">
+          <div class="avatar-preview-lg" id="avatarPreview">د</div>
+          <div>
+            <label class="table-btn cursor-pointer">
+              تغيير الصورة
+              <input type="file" id="avatarFile" accept="image/*" class="hidden">
+            </label>
+            <p class="text-xs text-gray-500 mt-1">صورة مربّعة صغيرة الحجم (أقل من 500KB) تعطي أفضل نتيجة.</p>
+          </div>
+        </div>
+        <div class="field">
+          <label>اسم المتجر</label>
+          <input type="text" name="name" required>
+        </div>
+        <div class="field">
+          <label>رقم واتساب المتجر</label>
+          <input type="tel" name="whatsapp" placeholder="0558XXXXXX">
+          <p class="text-xs text-gray-500 mt-1">تصلك طلبات زبائنك مباشرة على هذا الرقم عبر واتساب.</p>
+        </div>
+        <p id="profileMsg" class="hidden"></p>
+        <button type="submit" class="btn-primary">حفظ التعديلات</button>
+      </form>
+    </div>
+
+    <div class="settings-card">
+      <h2 class="font-display text-lg mb-1">صفحة متجرك العامة</h2>
+      <p class="text-sm text-gray-500 mb-5">هذه المعلومات تظهر لزبائنك عند زيارة رابط متجرك.</p>
+      <form id="storeProfileForm" class="space-y-4">
+        <div class="field">
+          <label>صورة غلاف المتجر (اختياري)</label>
+          <input type="file" id="bannerFile" accept="image/*">
+          <p class="text-xs text-gray-500 mt-1">صورة عريضة (أقل من 700KB) تظهر أعلى صفحة متجرك.</p>
+          <img id="bannerPreview" class="hidden mt-2 rounded-lg border" style="max-height:120px; width:100%; object-fit:cover; border-color: var(--c-line)">
+        </div>
+        <div class="field">
+          <label>نبذة عن المتجر</label>
+          <textarea name="bio" rows="3" placeholder="مثال: متجر متخصص في اشتراكات التصميم والذكاء الاصطناعي بأسعار الجملة."></textarea>
+        </div>
+        <div class="grid sm:grid-cols-3 gap-4">
+          <div class="field">
+            <label>📷 إنستغرام (اختياري)</label>
+            <input type="text" name="instagram" placeholder="username">
+          </div>
+          <div class="field">
+            <label>📘 فيسبوك (اختياري)</label>
+            <input type="text" name="facebook" placeholder="page name">
+          </div>
+          <div class="field">
+            <label>🎵 تيك توك (اختياري)</label>
+            <input type="text" name="tiktok" placeholder="username">
+          </div>
+        </div>
+        <p id="storeProfileMsg" class="hidden"></p>
+        <button type="submit" class="btn-primary">حفظ صفحة المتجر</button>
+      </form>
+    </div>
+
+    <div class="settings-card">
+      <h2 class="font-display text-lg mb-5">تغيير كلمة المرور</h2>
+      <form id="passwordForm" class="space-y-4">
+        <div class="field">
+          <label>كلمة المرور الحالية</label>
+          <input type="password" name="currentPassword" required>
+        </div>
+        <div class="field">
+          <label>كلمة المرور الجديدة</label>
+          <input type="password" name="newPassword" required minlength="6">
+        </div>
+        <div class="field">
+          <label>تأكيد كلمة المرور الجديدة</label>
+          <input type="password" name="confirmPassword" required minlength="6">
+        </div>
+        <p id="passwordMsg" class="hidden"></p>
+        <button type="submit" class="btn-outline">تحديث كلمة المرور</button>
+      </form>
+    </div>
+  </main>
+</div>
+
+<script type="module">
+  import { Settings } from "./js/settings.js";
+  Settings.init();
+</script>
+</body>
+</html>

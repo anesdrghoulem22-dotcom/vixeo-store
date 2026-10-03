@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم — دكان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="dash-shell dash-shell-v2 grid md:grid-cols-[250px_1fr]">
+
+  <aside class="dash-sidebar-v2 p-4 flex md:flex-col gap-1 md:min-h-screen md:sticky md:top-0 md:h-screen md:overflow-y-auto">
+    <div class="hidden md:flex items-center gap-3 mb-4 px-1">
+      <span class="brand-mark">د</span>
+      <span class="font-display text-lg">دكان</span>
+    </div>
+
+    <p class="sidebar-group-label">المتجر</p>
+    <button class="dash-tab-v2 is-active" data-tab-btn="overview"><span class="tab-icon">🏠</span> نظرة عامة</button>
+    <button class="dash-tab-v2" data-tab-btn="products"><span class="tab-icon">📦</span> منتجاتي</button>
+    <button class="dash-tab-v2" data-tab-btn="orders"><span class="tab-icon">🧾</span> الطلبات</button>
+    <button class="dash-tab-v2" data-tab-btn="customers"><span class="tab-icon">🧑‍🤝‍🧑</span> العملاء</button>
+    <button class="dash-tab-v2" data-tab-btn="delivery"><span class="tab-icon">🚚</span> التوصيل</button>
+
+    <p class="sidebar-group-label">التسويق والنمو</p>
+    <button class="dash-tab-v2" data-tab-btn="analytics"><span class="tab-icon">📊</span> الإحصائيات</button>
+    <button class="dash-tab-v2" data-tab-btn="coupons"><span class="tab-icon">🎟️</span> كوبونات الخصم</button>
+    <button class="dash-tab-v2" data-tab-btn="pixels"><span class="tab-icon">📢</span> التسويق والبيكسل</button>
+
+    <p class="sidebar-group-label">الفريق والحماية</p>
+    <button class="dash-tab-v2" data-tab-btn="staff"><span class="tab-icon">👥</span> فريق العمل</button>
+    <button class="dash-tab-v2" data-tab-btn="blacklist"><span class="tab-icon">🚫</span> القائمة السوداء
+      <span id="blacklistBadge" class="tab-badge hidden">0</span>
+    </button>
+
+    <p class="sidebar-group-label">الحساب</p>
+    <a id="viewStoreLink" href="#" class="dash-tab-v2" target="_blank"><span class="tab-icon">🏬</span> عرض متجري</a>
+    <a href="settings.html" class="dash-tab-v2"><span class="tab-icon">⚙️</span> إعدادات الحساب</a>
+    <a href="admin.html" id="adminLink" class="dash-tab-v2 hidden"><span class="tab-icon">🛡️</span> لوحة الإدارة</a>
+    <button id="logoutBtn" class="dash-tab-v2 mt-auto" style="color:#F3A98F"><span class="tab-icon">↩</span> تسجيل الخروج</button>
+  </aside>
+
+  <div>
+    <div class="dash-topbar-v2">
+      <div class="flex items-center gap-3">
+        <div class="avatar-circle" id="sellerAvatar">د</div>
+        <div>
+          <p class="text-xs text-gray-500">مرحباً بعودتك،</p>
+          <h1 class="font-display text-lg leading-tight" id="sellerName">—</h1>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="topbar-search hidden sm:flex">
+          <span>🔍</span>
+          <input id="dashSearch" type="text" placeholder="ابحث عن منتج أو طلب…">
+        </div>
+        <div class="bell-wrap">
+          <button id="bellBtn" class="bell-btn" title="التنبيهات">
+            🔔<span id="bellDot" class="bell-dot hidden">0</span>
+          </button>
+          <div id="bellPanel" class="bell-panel hidden">
+            <div class="bell-panel-head">التنبيهات</div>
+            <div id="bellPanelBody"><p class="bell-empty">جارٍ التحميل…</p></div>
+          </div>
+        </div>
+        <button id="copyStoreLinkBtn" class="btn-outline !py-2 !px-3 text-sm">نسخ رابط المتجر</button>
+      </div>
+    </div>
+
+    <main class="p-5 md:p-8">
+      <div id="statusBanner" class="mb-5"></div>
+
+      <!-- تبويب نظرة عامة -->
+      <section data-tab-panel="overview">
+        <div id="alertsWrap" class="mb-6"></div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="kpi-card">
+            <div class="kpi-icon tone-primary">📦</div>
+            <div><p class="kpi-value" id="statProducts">0</p><p class="kpi-label">منتج منشور</p></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon tone-info">🧾</div>
+            <div><p class="kpi-value" id="statOrders">0</p><p class="kpi-label">طلب مستلم</p></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon tone-accent">💰</div>
+            <div><p class="kpi-value" id="statRevenue">0 د.ج</p><p class="kpi-label">إجمالي المبيعات</p></div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon tone-danger">🧑‍🤝‍🧑</div>
+            <div><p class="kpi-value" id="statCustomers">0</p><p class="kpi-label">عميل</p></div>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-5">
+          <div class="settings-card">
+            <div class="section-head"><h2>آخر الطلبات</h2></div>
+            <div id="recentOrdersWrap"><p class="text-gray-400 text-sm">جارٍ التحميل…</p></div>
+          </div>
+          <div class="settings-card">
+            <div class="section-head"><h2>الزيارات — آخر 14 يوم</h2></div>
+            <div id="overviewChart"><p class="text-gray-400 text-sm">جارٍ التحميل…</p></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- تبويب المنتجات -->
+      <section data-tab-panel="products" class="hidden">
+        <div class="section-head">
+          <div><h2>منتجاتي</h2><p class="section-sub">أضف، عدّل، واحذف منتجاتك الرقمية والملموسة.</p></div>
+          <button id="addProductBtn" class="btn-primary">+ إضافة منتج</button>
+        </div>
+        <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
+          <table class="dash-table min-w-[700px]">
+            <thead>
+              <tr><th>المنتج</th><th>التصنيف</th><th>النوع</th><th>السعر</th><th>المخزون</th><th></th></tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+          <p id="productsEmpty" class="hidden text-center py-14 text-gray-400">لم تضف أي منتج بعد. ابدأ بإضافة أول منتج لك.</p>
+        </div>
+      </section>
+
+      <!-- تبويب الطلبات -->
+      <section data-tab-panel="orders" class="hidden">
+        <div class="section-head">
+          <div><h2>الطلبات الواردة</h2><p class="section-sub">تابع طلباتك وحدّث حالتها أولاً بأول.</p></div>
+          <button id="exportOrdersBtn" class="export-btn">⬇️ تصدير CSV</button>
+        </div>
+        <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
+          <table class="dash-table min-w-[680px]">
+            <thead>
+              <tr><th>رقم الطلب</th><th>الزبون</th><th>المنتجات</th><th>المجموع</th><th>الحالة</th><th></th></tr>
+            </thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+          <p id="ordersEmpty" class="hidden text-center py-14 text-gray-400">لا توجد طلبات بعد.</p>
+        </div>
+      </section>
+
+      <!-- تبويب العملاء -->
+      <section data-tab-panel="customers" class="hidden">
+        <div class="section-head">
+          <div><h2>العملاء</h2><p class="section-sub">قائمة مُشتقّة من طلباتك — العملاء المتكررون يحصلون على وسام VIP.</p></div>
+        </div>
+        <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
+          <table class="dash-table min-w-[600px]">
+            <thead>
+              <tr><th>العميل</th><th>الولاية</th><th>عدد الطلبات</th><th>إجمالي الإنفاق</th><th>آخر طلب</th></tr>
+            </thead>
+            <tbody id="customersBody"></tbody>
+          </table>
+          <p id="customersEmpty" class="hidden text-center py-14 text-gray-400">لا يوجد عملاء بعد.</p>
+        </div>
+      </section>
+
+      <!-- تبويب التوصيل -->
+      <section data-tab-panel="delivery" class="hidden">
+        <div class="section-head">
+          <div><h2>أسعار التوصيل حسب الولاية</h2><p class="section-sub">يُحتسب سعر التوصيل تلقائياً في سلة الزبون حسب الولاية المختارة.</p></div>
+        </div>
+
+        <div class="settings-card">
+          <label class="flex items-center gap-2 mb-4" style="cursor:pointer">
+            <input type="checkbox" id="deliveryEnabled" style="width:16px;height:16px">
+            <span class="font-semibold text-sm">تفعيل احتساب سعر التوصيل تلقائياً</span>
+          </label>
+          <div class="grid sm:grid-cols-2 gap-4 mb-2">
+            <div class="field">
+              <label>السعر الافتراضي — توصيل للمنزل (د.ج)</label>
+              <input type="number" id="defaultHome" min="0" placeholder="600">
+            </div>
+            <div class="field">
+              <label>السعر الافتراضي — توصيل لمكتب الشحن (د.ج)</label>
+              <input type="number" id="defaultDesk" min="0" placeholder="400">
+            </div>
+          </div>
+          <button id="saveDeliveryBtn" class="btn-primary">حفظ الإعدادات</button>
+          <p id="deliveryMsg" class="hidden mt-2"></p>
+        </div>
+
+        <div class="settings-card">
+          <h3 class="font-display mb-3">أسعار مخصّصة لكل ولاية (اختياري)</h3>
+          <input id="wilayaSearch" class="wilaya-search" type="search" placeholder="ابحث عن ولاية…">
+          <div class="wilaya-row" style="font-weight:700; color:#7A7266; font-size:.8rem;">
+            <span>الولاية</span><span>منزل</span><span>مكتب</span>
+          </div>
+          <div id="wilayaList" style="max-height:420px; overflow-y:auto;"></div>
+        </div>
+      </section>
+
+      <!-- تبويب الإحصائيات -->
+      <section data-tab-panel="analytics" class="hidden">
+        <div class="section-head"><div><h2>الإحصائيات والتقارير</h2></div></div>
+        <div id="analyticsWrap"></div>
+      </section>
+
+      <!-- تبويب الكوبونات -->
+      <section data-tab-panel="coupons" class="hidden">
+        <div class="section-head"><div><h2>كوبونات الخصم</h2></div></div>
+
+        <div class="settings-card">
+          <h3 class="font-display mb-4">إنشاء كوبون جديد</h3>
+          <form id="couponForm" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="field">
+              <label>رمز الكوبون</label>
+              <input type="text" name="code" required placeholder="RAMADAN20" style="text-transform:uppercase">
+            </div>
+            <div class="field">
+              <label>نوع الخصم</label>
+              <select name="type" required>
+                <option value="percent">نسبة مئوية (%)</option>
+                <option value="fixed">مبلغ ثابت (د.ج)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>قيمة الخصم</label>
+              <input type="number" name="value" required min="1" placeholder="20">
+            </div>
+            <div class="field">
+              <label>حد أدنى للطلب (اختياري)</label>
+              <input type="number" name="minOrder" min="0" placeholder="0">
+            </div>
+            <div class="field">
+              <label>أقصى عدد استعمالات (اختياري)</label>
+              <input type="number" name="maxUses" min="0" placeholder="بلا حد">
+            </div>
+            <div class="field">
+              <label>تاريخ الانتهاء (اختياري)</label>
+              <input type="date" name="expiresAt">
+            </div>
+            <div class="lg:col-span-3">
+              <button type="submit" class="btn-primary">إنشاء الكوبون</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
+          <table class="dash-table min-w-[640px]">
+            <thead>
+              <tr><th>الرمز</th><th>الخصم</th><th>الاستعمالات</th><th>الحالة</th><th></th></tr>
+            </thead>
+            <tbody id="couponsBody"></tbody>
+          </table>
+          <p id="couponsEmpty" class="hidden text-center py-14 text-gray-400">لم تنشئ أي كوبون بعد.</p>
+        </div>
+      </section>
+
+      <!-- تبويب فريق العمل -->
+      <section data-tab-panel="staff" class="hidden">
+        <div class="section-head"><div><h2>فريق العمل والموظفون</h2></div></div>
+
+        <div class="settings-card">
+          <h3 class="font-display mb-1">إضافة موظف جديد</h3>
+          <p class="text-sm text-gray-500 mb-4">حدّد صلاحيات محدودة لكل موظف حسب مهمته.</p>
+          <form id="staffForm" class="space-y-4">
+            <div class="grid sm:grid-cols-3 gap-4">
+              <div class="field">
+                <label>اسم الموظف</label>
+                <input type="text" name="name" required placeholder="محمد أمين">
+              </div>
+              <div class="field">
+                <label>البريد الإلكتروني</label>
+                <input type="email" name="email" placeholder="staff@example.com">
+              </div>
+              <div class="field">
+                <label>رقم الهاتف</label>
+                <input type="tel" name="phone" placeholder="05XXXXXXXX">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-2">الصلاحيات</label>
+              <div id="staffPerms" class="perms-grid"></div>
+            </div>
+            <button type="submit" class="btn-primary">إضافة الموظف</button>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
+          <table class="dash-table min-w-[640px]">
+            <thead>
+              <tr><th>الموظف</th><th>الصلاحيات</th><th>الحالة</th><th></th></tr>
+            </thead>
+            <tbody id="staffBody"></tbody>
+          </table>
+          <p id="staffEmpty" class="hidden text-center py-14 text-gray-400">لم تضف أي موظف بعد.</p>
+        </div>
+      </section>
+
+      <!-- تبويب القائمة السوداء -->
+      <section data-tab-panel="blacklist" class="hidden">
+        <div class="section-head">
+          <div><h2>القائمة السوداء</h2>
+            <p class="section-sub">أضف أرقام العملاء الذين يرفضون استلام الطلبات (COD) لحماية متجرك من خسائر الشحن.</p>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <form id="blacklistForm" class="grid sm:grid-cols-3 gap-4 items-end">
+            <div class="field">
+              <label>رقم الهاتف</label>
+              <input type="tel" name="phone" required placeholder="05XXXXXXXX">
+            </div>
+            <div class="field">
+              <label>الاسم (اختياري)</label>
+              <input type="text" name="name" placeholder="اسم العميل">
+            </div>
+            <div class="field">
+              <label>السبب</label>
+              <input type="text" name="reason" placeholder="رفض استلام الطلب">
+            </div>
+            <div class="sm:col-span-3">
+              <button type="submit" class="btn-primary">إضافة للقائمة السوداء</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
+          <table class="dash-table min-w-[640px]">
+            <thead>
+              <tr><th>رقم الهاتف</th><th>الاسم</th><th>السبب</th><th>تاريخ الإضافة</th></tr>
+            </thead>
+            <tbody id="blacklistBody"></tbody>
+          </table>
+          <p id="blacklistEmpty" class="hidden text-center py-14 text-gray-400">القائمة السوداء فارغة.</p>
+        </div>
+      </section>
+
+      <!-- تبويب التسويق والبيكسل -->
+      <section data-tab-panel="pixels" class="hidden">
+        <div class="section-head">
+          <div><h2>أدوات التسويق والتتبع</h2><p class="section-sub">اربط متجرك بمنصات الإعلانات لتتبع الزيارات والطلبات.</p></div>
+        </div>
+
+        <div class="settings-card">
+          <form id="pixelsForm" class="space-y-4">
+            <div class="field">
+              <label>🔵 Facebook Pixel ID</label>
+              <input type="text" name="facebook" placeholder="123456789012345">
+            </div>
+            <div class="field">
+              <label>⚫ TikTok Pixel ID</label>
+              <input type="text" name="tiktok" placeholder="CXXXXXXXXXXXXXXXXXX">
+            </div>
+            <div class="field">
+              <label>🟡 Snapchat Pixel ID</label>
+              <input type="text" name="snapchat" placeholder="xxxxxxxx-xxxx-xxxx-xxxx">
+            </div>
+            <div class="field">
+              <label>🟠 Google Analytics (Measurement ID)</label>
+              <input type="text" name="googleAnalytics" placeholder="G-XXXXXXXXXX">
+            </div>
+            <div class="field">
+              <label>🔷 Google Tag Manager (Container ID)</label>
+              <input type="text" name="googleTagManager" placeholder="GTM-XXXXXXX">
+            </div>
+            <button type="submit" class="btn-primary">حفظ إعدادات التتبع</button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- نافذة إضافة / تعديل منتج -->
+<div id="productModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="font-display text-lg" id="modalTitle">إضافة منتج جديد</h3>
+      <button id="closeModalBtn" class="text-xl leading-none">✕</button>
+    </div>
+    <form id="productForm" class="space-y-4">
+      <input type="hidden" name="id">
+      <div class="field">
+        <label>اسم المنتج</label>
+        <input type="text" name="name" required placeholder="مثال: Canva Pro — شهر واحد">
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="field">
+          <label>التصنيف</label>
+          <select name="category" required></select>
+        </div>
+        <div class="field">
+          <label>نوع المنتج</label>
+          <select name="type" required>
+            <option value="digital">⚡ منتج رقمي (تسليم أونلاين)</option>
+            <option value="physical">🚚 منتج ملموس (يحتاج توصيل)</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="field">
+          <label>السعر (د.ج)</label>
+          <input type="number" name="price" min="0" required>
+        </div>
+        <div class="field">
+          <label>السعر قبل الخصم (اختياري)</label>
+          <input type="number" name="oldPrice" min="0">
+        </div>
+      </div>
+      <div class="field">
+        <label>المخزون</label>
+        <input type="number" name="stock" min="0" required value="10">
+      </div>
+
+      <div class="field">
+        <label>صورة المنتج (اختياري)</label>
+        <input type="file" name="imageFile" id="imageFile" accept="image/*">
+        <p class="text-xs text-gray-500 mt-1">أو الصق رابط صورة جاهز بدل الرفع:</p>
+        <input type="url" name="imageUrl" placeholder="https://..." class="mt-1">
+        <img id="imagePreview" class="hidden mt-2 rounded-lg border" style="max-height:140px; border-color: var(--c-line)">
+      </div>
+
+      <div class="field">
+        <label>الوصف</label>
+        <textarea name="description" rows="3" placeholder="تفاصيل الاشتراك أو المنتج، مدة الصلاحية، طريقة التفعيل أو التوصيل…"></textarea>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary flex-1">حفظ المنتج</button>
+        <button type="button" id="cancelModalBtn" class="btn-outline">إلغاء</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- نافذة تفاصيل الطلب -->
+<div id="orderModal" class="modal-overlay hidden">
+  <div class="modal-box order-modal-box">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-display text-lg">تفاصيل الطلب</h3>
+      <button id="closeOrderModalBtn" class="text-xl leading-none">✕</button>
+    </div>
+    <div id="orderModalBody"></div>
+  </div>
+</div>
+
+<script type="module">
+  import { Dashboard } from "./js/dashboard.js";
+  Dashboard.initDashboard();
+</script>
+</body>
+</html>

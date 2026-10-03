@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دكان — متجرك الإلكتروني لبيع وشراء كل شيء أونلاين</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
+    <a href="index.html" class="flex items-center gap-3">
+      <span class="brand-mark">د</span>
+      <span class="font-display text-lg">دكان</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-6 text-sm">
+      <a href="market.html" class="nav-link">تصفّح المتجر</a>
+      <a href="#pricing" class="nav-link">خطط البائعين</a>
+    </nav>
+    <div class="flex items-center gap-3 text-sm">
+      <a href="login.html" class="nav-link hidden sm:inline">دخول البائعين</a>
+      <a href="register.html" class="btn-primary !py-2 !px-4 whitespace-nowrap">افتح متجرك</a>
+    </div>
+  </div>
+</header>
+
+<section class="landing-hero py-16 md:py-24">
+  <div class="max-w-6xl mx-auto px-5 text-center">
+    <span class="hero-eyebrow-line"></span>
+    <span class="text-sm font-semibold" style="color: var(--c-primary)">منصة بائعين متعددين</span>
+    <h1 class="font-display text-3xl md:text-5xl mt-4 max-w-3xl mx-auto leading-tight">
+      متجرك الإلكتروني الخاص، جاهز خلال دقائق
+    </h1>
+    <p class="mt-5 max-w-xl mx-auto text-gray-600">
+      دكان منصة تجمع البائعين والزبائن في مكان واحد: بيع أي منتج تحبّه — رقمياً أو ملموساً — بمتجر إلكتروني خاص، إدارة كاملة للطلبات، وتواصل مباشر مع الزبائن عبر واتساب.
+    </p>
+
+    <div id="trialLiveWrap" class="hidden max-w-xl mx-auto mt-8"></div>
+
+    <div class="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto mt-10 text-right">
+      <a href="market.html" class="role-card">
+        <div class="role-icon">🛍️</div>
+        <h3 class="font-display text-lg mb-1">أنا زبون</h3>
+        <p class="text-sm text-gray-600">تصفح كل منتجات البائعين على المنصة واطلب ما يعجبك مباشرة.</p>
+      </a>
+      <a href="register.html" id="sellerCta" class="role-card">
+        <div class="role-icon">🏪</div>
+        <h3 class="font-display text-lg mb-1">أنا بائع</h3>
+        <p class="text-sm text-gray-600">افتح متجرك الخاص، أضف منتجاتك، واستفد من 7 أيام تجربة مجانية.</p>
+      </a>
+    </div>
+
+    <div class="trust-strip">
+      <div class="trust-item"><span class="trust-icon">🚫</span> بلا عمولة على مبيعاتك</div>
+      <div class="trust-item"><span class="trust-icon">⚡</span> متجرك جاهز خلال دقائق</div>
+      <div class="trust-item"><span class="trust-icon">💬</span> طلبات مباشرة عبر واتساب</div>
+      <div class="trust-item"><span class="trust-icon">🔒</span> بياناتك محفوظة بأمان</div>
+    </div>
+  </div>
+</section>
+
+<section class="border-y" style="border-color: var(--c-line); background: var(--c-white)">
+  <div class="max-w-5xl mx-auto px-5 py-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+    <div>
+      <p class="font-display text-3xl" id="statSellers">—</p>
+      <p class="text-sm text-gray-500 mt-1">بائع نشط</p>
+    </div>
+    <div>
+      <p class="font-display text-3xl" id="statProducts">—</p>
+      <p class="text-sm text-gray-500 mt-1">منتج معروض</p>
+    </div>
+    <div>
+      <p class="font-display text-3xl">7</p>
+      <p class="text-sm text-gray-500 mt-1">أيام تجربة مجانية</p>
+    </div>
+    <div>
+      <p class="font-display text-3xl">0%</p>
+      <p class="text-sm text-gray-500 mt-1">عمولة على المبيعات</p>
+    </div>
+  </div>
+</section>
+
+<section class="max-w-6xl mx-auto px-5 py-16">
+  <h2 class="font-display text-2xl md:text-3xl text-center mb-10">لماذا دكان؟</h2>
+  <div class="grid md:grid-cols-3 gap-5">
+    <div class="feature-card">
+      <div class="role-icon">🔗</div>
+      <h3 class="font-semibold mb-2">صفحة متجر خاصة بك</h3>
+      <p class="text-sm text-gray-600">رابط مباشر لمتجرك فقط، يمكنك مشاركته على إنستغرام وفيسبوك وواتساب.</p>
+    </div>
+    <div class="feature-card">
+      <div class="role-icon">💬</div>
+      <h3 class="font-semibold mb-2">طلبات تصل مباشرة لواتساب</h3>
+      <p class="text-sm text-gray-600">كل طلب زبون يُحوَّل تلقائياً لمحادثة واتساب جاهزة بكامل التفاصيل.</p>
+    </div>
+    <div class="feature-card">
+      <div class="role-icon">📊</div>
+      <h3 class="font-semibold mb-2">لوحة تحكم كاملة</h3>
+      <p class="text-sm text-gray-600">إحصائيات، عملاء، كوبونات، فريق عمل، وحماية من الطلبات الوهمية — كل شيء في مكان واحد.</p>
+    </div>
+  </div>
+</section>
+
+<section class="max-w-5xl mx-auto px-5 py-16 border-t" style="border-color: var(--c-line)">
+  <h2 class="font-display text-2xl md:text-3xl text-center mb-10">تفتح متجرك في 3 خطوات</h2>
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="step-item">
+      <span class="step-num">1</span>
+      <h3 class="font-semibold mb-1 mt-3">سجّل حسابك</h3>
+      <p class="text-sm text-gray-600">أنشئ حساب بائع خلال دقيقة، مع 7 أيام تجربة مجانية بلا التزام.</p>
+    </div>
+    <div class="step-item">
+      <span class="step-num">2</span>
+      <h3 class="font-semibold mb-1 mt-3">أضف منتجاتك</h3>
+      <p class="text-sm text-gray-600">منتجات رقمية أو ملموسة، مع صور وأسعار وتخفيضات وكوبونات خصم.</p>
+    </div>
+    <div class="step-item">
+      <span class="step-num">3</span>
+      <h3 class="font-semibold mb-1 mt-3">استقبل الطلبات</h3>
+      <p class="text-sm text-gray-600">شارك رابط متجرك، والطلبات تصلك مباشرة عبر واتساب بكل التفاصيل.</p>
+    </div>
+  </div>
+</section>
+
+<section class="max-w-6xl mx-auto px-5 pb-16">
+  <h2 class="font-display text-xl md:text-2xl text-center mb-6">تصفّح حسب التصنيف</h2>
+  <div id="categoryShowcase" class="flex flex-wrap items-center justify-center gap-2"></div>
+</section>
+
+<section id="pricing" class="max-w-6xl mx-auto px-5 py-16 border-t" style="border-color: var(--c-line)">
+  <div class="text-center mb-10">
+    <h2 class="font-display text-2xl md:text-3xl mb-3">خطط اشتراك البائعين</h2>
+    <p class="text-gray-600">اشتراك شهري بسيط، بلا عمولة على مبيعاتك — كلما ارتفعت الخطة، زاد ظهور متجرك. 7 أيام تجربة مجانية عند التسجيل.</p>
+  </div>
+  <div id="homePlansGrid" class="grid sm:grid-cols-3 gap-6 items-start"></div>
+</section>
+
+<footer class="border-t" style="border-color: var(--c-line); background: var(--c-white)">
+  <div class="max-w-6xl mx-auto px-5 py-12 grid sm:grid-cols-3 gap-8">
+    <div>
+      <div class="flex items-center gap-3 mb-3">
+        <span class="brand-mark">د</span>
+        <span class="font-display text-lg">دكان</span>
+      </div>
+      <p class="text-sm text-gray-500 leading-7">منصة بائعين متعددين لبيع كل أنواع المنتجات — رقمية أو ملموسة — بمتجر إلكتروني خاص لكل بائع وطلبات تصل مباشرة عبر واتساب.</p>
+    </div>
+    <div>
+      <h4 class="font-semibold text-sm mb-3">روابط سريعة</h4>
+      <ul class="space-y-2 text-sm text-gray-500">
+        <li><a href="market.html" class="nav-link">تصفّح المتجر</a></li>
+        <li><a href="register.html" class="nav-link">افتح متجرك</a></li>
+        <li><a href="#pricing" class="nav-link">خطط الاشتراك</a></li>
+        <li><a href="login.html" class="nav-link">دخول البائعين</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="font-semibold text-sm mb-3">للبائعين</h4>
+      <ul class="space-y-2 text-sm text-gray-500">
+        <li>✓ 7 أيام تجربة مجانية</li>
+        <li>✓ بلا عمولة على المبيعات</li>
+        <li>✓ لوحة تحكم كاملة</li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t" style="border-color: var(--c-line)">
+    <div class="max-w-6xl mx-auto px-5 py-5 text-xs text-gray-400 text-center">
+      © دكان — مشروع تجريبي يعمل بالكامل داخل المتصفح.
+    </div>
+  </div>
+</footer>
+
+<script type="module">
+  import { DB } from "./js/db.js";
+  import { Auth } from "./js/auth.js";
+  import { Store } from "./js/store.js";
+
+(async () => {
+  // إحصائيات حية من Firestore (منصة عامة القراءة)
+  try {
+    const [sellers, products] = await Promise.all([DB.getAllSellers(), DB.getProducts()]);
+    document.getElementById("statSellers").textContent = sellers.length;
+    document.getElementById("statProducts").textContent = products.length;
+  } catch (err) {
+    console.warn("[home stats]", err.message);
+    document.getElementById("statSellers").textContent = "—";
+    document.getElementById("statProducts").textContent = "—";
+  }
+
+  // شريط التصنيفات — يوجّه لصفحة المتجر العام مفلترة بنفس التصنيف
+  document.getElementById("categoryShowcase").innerHTML = DB.CATEGORIES.map((c) =>
+    `<a href="market.html?cat=${c.id}" class="chip">${c.icon} ${c.label}</a>`
+  ).join("");
+
+  // خطط الاشتراك — 3 خطط شهرية في صف واحد، بمزايا موضَّحة لكل خطة
+  function money(n) { return n.toLocaleString("ar-DZ") + " د.ج"; }
+  document.getElementById("homePlansGrid").innerHTML = DB.PLANS.map((p) => {
+    const badges = [];
+    if (p.priorityListing) badges.push(`<span class="plan-badge-pill">⭐ ظهور مبكر بين البائعين</span>`);
+    if (p.verifiedBadge) badges.push(`<span class="plan-badge-pill">✓ علامة متجر موثّق</span>`);
+    return `
+    <div class="plan-card${p.featured ? " is-featured" : ""}">
+      ${p.featured ? `<span class="plan-tag">${p.tagline}</span>` : ""}
+      <h3 class="font-display text-lg mb-1">${p.name}</h3>
+      ${!p.featured ? `<p class="plan-tagline">${p.tagline}</p>` : ""}
+      <p class="text-3xl font-extrabold my-3">${money(p.price)} <span class="text-base font-normal">/ شهر</span></p>
+      ${badges.length ? `<div class="plan-badges">${badges.join("")}</div>` : ""}
+      <ul class="text-sm text-gray-600 space-y-2 mb-6">
+        ${p.features.map((f) => `<li>✓ ${f}</li>`).join("")}
+      </ul>
+      <a href="pricing.html" class="plan-cta ${p.featured ? "btn-primary" : "btn-outline"} w-full">اشترك الآن</a>
+    </div>`;
+  }).join("");
+
+  const user = await Auth.waitForAuthReady();
+  if (!user) return;
+  const seller = await DB.getSellerById(user.uid);
+  if (!seller) return;
+
+  const sellerCta = document.getElementById("sellerCta");
+  sellerCta.href = "dashboard.html";
+  sellerCta.querySelector("h3").textContent = "الذهاب للوحة التحكم";
+  sellerCta.querySelector("p").textContent = "متجرك جاهز — تابع منتجاتك وطلباتك من هنا.";
+
+  const status = Auth.getAccountStatus(seller);
+  if (status.state === "trial") {
+    const wrap = document.getElementById("trialLiveWrap");
+    wrap.classList.remove("hidden");
+    wrap.innerHTML = `<div class="trial-live-banner">
+      <span>🕐 مرحباً ${Store.escapeHtml(seller.name)}، متبقٍ من تجربتك المجانية:</span>
+      <span class="countdown-badge" id="landingCountdown">...</span>
+    </div>`;
+    Store.startCountdown(status.end, (p) => {
+      document.getElementById("landingCountdown").textContent =
+        `${p.d} يوم ${String(p.h).padStart(2, "0")}:${String(p.m).padStart(2, "0")}:${String(p.s).padStart(2, "0")}`;
+    });
+  } else if (status.state === "expired") {
+    const wrap = document.getElementById("trialLiveWrap");
+    wrap.classList.remove("hidden");
+    wrap.innerHTML = `<div class="trial-live-banner">
+      <span>⚠️ انتهت فترتك التجريبية.</span>
+      <a href="pricing.html" class="status-link font-bold">اشترك الآن</a>
+    </div>`;
+  }
+})();
+</script>
+</body>
+</html>

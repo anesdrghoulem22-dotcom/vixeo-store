@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تصفّح المنتجات — دكان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header sticky top-0 z-40">
+  <div class="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
+    <a href="index.html" class="flex items-center gap-3">
+      <span class="brand-mark">د</span>
+      <span class="font-display text-lg">دكان</span>
+    </a>
+    <nav class="hidden md:flex items-center gap-6 text-sm">
+      <a href="market.html" class="nav-link">المتجر</a>
+      <a href="register.html" class="nav-link">بيع منتجاتك معنا</a>
+    </nav>
+    <div class="flex items-center gap-3">
+      <a href="login.html" class="nav-link text-sm hidden sm:inline">دخول البائعين</a>
+      <a href="cart.html" class="cart-fab">
+        🛒 <span>السلة</span>
+        <span class="cart-badge hidden" data-cart-badge>0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<section class="hero py-14 md:py-20">
+  <div class="max-w-6xl mx-auto px-5">
+    <span class="hero-eyebrow-line"></span>
+    <span class="text-sm font-semibold" style="color: var(--c-primary)">منتجات حقيقية، من بائعين حقيقيين</span>
+    <h1 class="font-display text-3xl md:text-5xl mt-3 max-w-2xl leading-tight">
+      من الأزياء للإلكترونيات، كل ما تحتاجه في مكان واحد
+    </h1>
+    <p class="mt-4 max-w-xl text-gray-600">
+      تصفح، قارن، واطلب ما يعجبك خلال دقائق — منتجات من بائعين حقيقيين على المنصة.
+    </p>
+    <div class="hero-search flex items-center gap-3 mt-8 max-w-xl px-4 py-3">
+      <span>🔍</span>
+      <input id="searchInput" type="text" placeholder="ابحث عن منتج، مثال: حذاء رياضي، ساعة يد…">
+    </div>
+  </div>
+</section>
+
+<main class="max-w-6xl mx-auto px-5 py-10">
+  <div id="categoryBar" class="flex items-center gap-2 overflow-x-auto pb-2 mb-8"></div>
+
+  <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5"></div>
+
+  <p id="emptyState" class="hidden text-center py-20 text-gray-500"></p>
+</main>
+
+<footer class="border-t mt-10" style="border-color: var(--c-line)">
+  <div class="max-w-6xl mx-auto px-5 py-8 text-sm text-gray-500 flex flex-col md:flex-row items-center justify-between gap-3">
+    <p>© دكان — مشروع تجريبي يعمل بالكامل داخل المتصفح (بدون خادم).</p>
+    <a href="register.html" class="nav-link">هل أنت بائع؟ افتح متجرك الآن</a>
+  </div>
+</footer>
+
+<script type="module">
+  import { Store } from "./js/store.js";
+  Store.initMarket();
+</script>
+</body>
+</html>

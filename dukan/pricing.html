@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خطط الاشتراك — دكان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-3">
+      <span class="brand-mark">د</span>
+      <span class="font-display text-lg">دكان</span>
+    </a>
+    <a href="dashboard.html" class="nav-link text-sm">العودة للوحة التحكم</a>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-5 py-14">
+  <div id="expiredNotice" class="hidden auth-error mb-8">
+    انتهت فترتك التجريبية المجانية. اختر خطة اشتراك وتواصل معنا عبر واتساب لتفعيلها والمتابعة في استخدام لوحة التحكم.
+  </div>
+
+  <div class="text-center mb-12">
+    <h1 class="font-display text-2xl md:text-3xl mb-3">اختر خطة اشتراكك كبائع</h1>
+    <p class="text-gray-600">اشتراك شهري بسيط، بلا عمولة على مبيعاتك — كلما ارتفعت الخطة، زاد ظهور متجرك.</p>
+  </div>
+
+  <div id="plansGrid" class="grid sm:grid-cols-3 gap-5"></div>
+
+  <p class="text-center text-xs text-gray-400 mt-10">
+    الضغط على "اشترك عبر واتساب" يفتح محادثة جاهزة بتفاصيل طلبك — يتم تفعيل اشتراكك يدوياً من طرف فريق دكان بعد تأكيد الدفع.
+  </p>
+</main>
+
+<script type="module">
+  import { DB } from "./js/db.js";
+  import { Auth } from "./js/auth.js";
+  import { Store } from "./js/store.js";
+
+(async () => {
+  const user = await Auth.waitForAuthReady();
+  if (!user) { window.location.href = "login.html"; return; }
+  const seller = await DB.getSellerById(user.uid);
+  if (!seller) { window.location.href = "login.html"; return; }
+
+  if (new URLSearchParams(location.search).get("expired") === "1") {
+    document.getElementById("expiredNotice").classList.remove("hidden");
+  }
+
+  function money(n) { return n.toLocaleString("ar-DZ") + " د.ج"; }
+
+  document.getElementById("plansGrid").innerHTML = DB.PLANS.map((p) => {
+    const badges = [];
+    if (p.priorityListing) badges.push(`<span class="plan-badge-pill">⭐ ظهور مبكر بين البائعين</span>`);
+    if (p.verifiedBadge) badges.push(`<span class="plan-badge-pill">✓ علامة متجر موثّق</span>`);
+    return `
+    <div class="plan-card${p.featured ? " is-featured" : ""}">
+      ${p.featured ? `<span class="plan-tag">${p.tagline}</span>` : ""}
+      <h2 class="font-display text-lg mb-1">${p.name}</h2>
+      ${!p.featured ? `<p class="plan-tagline">${p.tagline}</p>` : ""}
+      <p class="text-3xl font-extrabold my-3">${money(p.price)} <span class="text-base font-normal">/ شهر</span></p>
+      ${badges.length ? `<div class="plan-badges">${badges.join("")}</div>` : ""}
+      <ul class="text-sm text-gray-600 space-y-2 mb-6">
+        ${p.features.map((f) => `<li>✓ ${f}</li>`).join("")}
+      </ul>
+      <button class="plan-cta ${p.featured ? "btn-primary" : "btn-outline"} w-full" data-plan="${p.id}">اشترك عبر واتساب</button>
+    </div>`;
+  }).join("");
+
+  document.querySelectorAll("[data-plan]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const plan = DB.getPlan(btn.dataset.plan);
+      const message =
+        `مرحباً، أود تفعيل اشتراك "${plan.name}" لمتجري الخاص بي على منصتكم.\n\n` +
+        `اسم المتجر: ${seller.name}\n` +
+        `البريد الإلكتروني: ${seller.email}\n` +
+        `السعر: ${money(plan.price)} شهرياً`;
+      const link = Store.waLink(DB.PLATFORM_WHATSAPP, message);
+      window.open(link, "_blank");
+    });
+  });
+})();
+</script>
+</body>
+</html>

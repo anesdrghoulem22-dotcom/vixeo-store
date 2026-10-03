@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة الإدارة — دكان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="adminShell" class="hidden">
+  <header class="site-header">
+    <div class="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-3">
+        <span class="brand-mark">د</span>
+        <span class="font-display text-lg">دكان — الإدارة</span>
+      </a>
+      <div class="flex items-center gap-3 text-sm">
+        <span class="text-gray-500 hidden sm:inline" id="adminEmail">—</span>
+        <button id="logoutBtn" class="table-btn table-btn-danger">تسجيل الخروج</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-5 py-8">
+
+    <div class="grid sm:grid-cols-3 gap-4 mb-8">
+      <div class="stat-card">
+        <p class="stat-value" id="statTotal">0</p>
+        <p class="stat-label">إجمالي البائعين</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-value" id="statSubscribed">0</p>
+        <p class="stat-label">مشترك فعّال</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-value" id="statTrial">0</p>
+        <p class="stat-label">في الفترة التجريبية</p>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h2 class="font-display text-lg mb-1">تفعيل اشتراك بالبريد الإلكتروني</h2>
+      <p class="text-sm text-gray-500 mb-5">اكتب بريد البائع بعد تأكيد الدفع، واختر نوع الخطة.</p>
+      <form id="quickForm" class="grid sm:grid-cols-[1fr_auto_auto] gap-3 items-end">
+        <div class="field">
+          <label>البريد الإلكتروني للبائع</label>
+          <input type="email" name="email" required placeholder="seller@example.com">
+        </div>
+        <div class="field">
+          <label>الخطة</label>
+          <select name="plan" id="quickPlanSelect" required></select>
+        </div>
+        <button type="submit" class="btn-primary">تفعيل الاشتراك</button>
+      </form>
+      <p id="adminToast" class="admin-toast hidden"></p>
+    </div>
+
+    <div class="flex items-center justify-between gap-3 mb-4 mt-8 flex-wrap">
+      <h2 class="font-display text-lg">كل البائعين</h2>
+      <div class="flex items-center gap-2">
+        <input id="adminSearch" type="search" placeholder="بحث بالبريد أو الاسم…"
+               style="border:1px solid var(--c-line); border-radius:10px; padding:.5rem .8rem; background:var(--c-white)">
+        <button id="refreshBtn" class="btn-outline !py-2 !px-4">تحديث</button>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
+      <table class="dash-table min-w-[640px]">
+        <thead>
+          <tr><th>البائع</th><th>الحالة</th><th>نهاية الاشتراك</th><th></th></tr>
+        </thead>
+        <tbody id="sellersBody"></tbody>
+      </table>
+      <p id="sellersEmpty" class="hidden text-center py-14 text-gray-400">لا يوجد بائعون مسجّلون بعد.</p>
+    </div>
+
+  </main>
+</div>
+
+<script type="module">
+  import { Admin } from "./js/admin.js";
+  Admin.init();
+</script>
+</body>
+</html>
