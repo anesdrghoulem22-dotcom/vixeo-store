@@ -8,77 +8,265 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="css/style.css">
+<style>
+  /* أنماط خاصة بلوحة الإدارة فقط — لا تمس style.css */
+  .adm-tabs { display:flex; gap:.4rem; overflow-x:auto; padding-bottom:.4rem; margin-bottom:1.5rem; border-bottom:1px solid var(--c-line); }
+  .adm-tab { padding:.6rem 1rem; border-radius:10px 10px 0 0; font-weight:700; font-size:.92rem; white-space:nowrap; color:#6B645A; border:0; background:transparent; cursor:pointer; position:relative; }
+  .adm-tab:hover { color:var(--c-primary-dark); }
+  .adm-tab.is-active { color:var(--c-primary-dark); background:var(--c-white); box-shadow:inset 0 -3px 0 var(--c-primary); }
+  .adm-tab .count { font-size:.7rem; background:var(--c-sand); border-radius:999px; padding:.1rem .45rem; margin-inline-start:.3rem; }
+  .adm-pane.hidden { display:none; }
+  .adm-input, .adm-select { border:1px solid var(--c-line); border-radius:10px; padding:.5rem .8rem; background:var(--c-white); font-size:.9rem; }
+  .adm-input:focus, .adm-select:focus { outline:none; border-color:var(--c-primary); }
+  .adm-toolbar { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; margin-bottom:1rem; }
+  .adm-toolbar .grow { flex:1; min-width:180px; }
+  .adm-card { background:var(--c-white); border:1px solid var(--c-line); border-radius:16px; padding:1.3rem; }
+  .adm-card h3 { font-weight:800; margin-bottom:.8rem; }
+  .adm-thumb { width:40px; height:40px; border-radius:8px; object-fit:cover; background:var(--c-sand); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .chip-warn { background:#FBF2E1; color:#7A5A17; }
+  .chip-blue { background:#E7EAF2; color:#2F3F73; }
+  .mini-row { display:flex; justify-content:space-between; gap:.6rem; padding:.5rem 0; border-bottom:1px dashed var(--c-line); font-size:.88rem; }
+  .mini-row:last-child { border-bottom:0; }
+  .bar { height:8px; border-radius:999px; background:var(--c-sand); overflow:hidden; }
+  .bar > span { display:block; height:100%; background:var(--c-primary); }
+  .adm-modal-box { max-width:640px; }
+  .adm-section { border-top:1px solid var(--c-line); padding-top:1rem; margin-top:1rem; }
+  .adm-section h4 { font-weight:800; font-size:.95rem; margin-bottom:.6rem; }
+  .btn-row { display:flex; flex-wrap:wrap; gap:.4rem; }
+  .btn-row .table-btn { margin-inline-start:0; }
+  .table-btn-ok { color:var(--c-primary-dark); border-color:#BEDFD3; background:#F3FAF7; }
+  .stock-input { width:70px; border:1px solid var(--c-line); border-radius:8px; padding:.25rem .4rem; font-size:.85rem; }
+  .pager { display:flex; justify-content:center; gap:.5rem; margin-top:1rem; align-items:center; font-size:.85rem; }
+  .kv { display:grid; grid-template-columns:auto 1fr; gap:.3rem .9rem; font-size:.88rem; }
+  .kv dt { opacity:.6; }
+  td .clip { max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+</style>
 </head>
 <body>
 
 <div id="adminShell" class="hidden">
   <header class="site-header">
-    <div class="max-w-5xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
+    <div class="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
       <a href="index.html" class="flex items-center gap-3">
         <span class="brand-mark">د</span>
         <span class="font-display text-lg">دكان — الإدارة</span>
       </a>
       <div class="flex items-center gap-3 text-sm">
-        <span class="text-gray-500 hidden sm:inline" id="adminEmail">—</span>
+        <a href="dashboard.html" class="text-gray-500 hover:underline hidden sm:inline">لوحة البائع</a>
+        <span class="text-gray-500 hidden md:inline" id="adminEmail">—</span>
         <button id="logoutBtn" class="table-btn table-btn-danger">تسجيل الخروج</button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-5 py-8">
+  <main class="max-w-6xl mx-auto px-5 py-8">
 
-    <div class="grid sm:grid-cols-3 gap-4 mb-8">
-      <div class="stat-card">
-        <p class="stat-value" id="statTotal">0</p>
-        <p class="stat-label">إجمالي البائعين</p>
-      </div>
-      <div class="stat-card">
-        <p class="stat-value" id="statSubscribed">0</p>
-        <p class="stat-label">مشترك فعّال</p>
-      </div>
-      <div class="stat-card">
-        <p class="stat-value" id="statTrial">0</p>
-        <p class="stat-label">في الفترة التجريبية</p>
-      </div>
-    </div>
+    <p id="adminToast" class="admin-toast hidden" style="position:sticky; top:.5rem; z-index:60; margin-top:0; margin-bottom:1rem"></p>
 
-    <div class="settings-card">
-      <h2 class="font-display text-lg mb-1">تفعيل اشتراك بالبريد الإلكتروني</h2>
-      <p class="text-sm text-gray-500 mb-5">اكتب بريد البائع بعد تأكيد الدفع، واختر نوع الخطة.</p>
-      <form id="quickForm" class="grid sm:grid-cols-[1fr_auto_auto] gap-3 items-end">
-        <div class="field">
-          <label>البريد الإلكتروني للبائع</label>
-          <input type="email" name="email" required placeholder="seller@example.com">
+    <nav class="adm-tabs" id="admTabs">
+      <button class="adm-tab is-active" data-tab="overview">📊 نظرة عامة</button>
+      <button class="adm-tab" data-tab="sellers">🏪 البائعون <span class="count" id="cntSellers">0</span></button>
+      <button class="adm-tab" data-tab="products">📦 المنتجات <span class="count" id="cntProducts">0</span></button>
+      <button class="adm-tab" data-tab="orders">🧾 الطلبات <span class="count" id="cntOrders">0</span></button>
+      <button class="adm-tab" data-tab="coupons">🏷️ الكوبونات <span class="count" id="cntCoupons">0</span></button>
+      <button class="adm-tab" data-tab="safety">🛡️ الفريق والحظر</button>
+      <button class="adm-tab" data-tab="tools">🧰 أدوات</button>
+    </nav>
+
+    <!-- ===================== نظرة عامة ===================== -->
+    <section class="adm-pane" id="pane-overview">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card"><p class="stat-value" id="statTotal">0</p><p class="stat-label">إجمالي البائعين</p></div>
+        <div class="stat-card"><p class="stat-value" id="statSubscribed">0</p><p class="stat-label">مشترك فعّال</p></div>
+        <div class="stat-card"><p class="stat-value" id="statTrial">0</p><p class="stat-label">في الفترة التجريبية</p></div>
+        <div class="stat-card"><p class="stat-value" id="statExpired">0</p><p class="stat-label">منتهي / بلا تجربة</p></div>
+        <div class="stat-card"><p class="stat-value" id="statMrr">0</p><p class="stat-label">إيراد الاشتراكات الفعّالة (شهرياً)</p></div>
+        <div class="stat-card"><p class="stat-value" id="statProducts">0</p><p class="stat-label">إجمالي المنتجات</p></div>
+        <div class="stat-card"><p class="stat-value" id="statOrders">0</p><p class="stat-label">إجمالي الطلبات</p></div>
+        <div class="stat-card"><p class="stat-value" id="statGmv">0</p><p class="stat-label">قيمة الطلبات (بدون الملغاة)</p></div>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-4 mb-6">
+        <div class="adm-card">
+          <h3>⏳ اشتراكات/تجارب تنتهي خلال 3 أيام</h3>
+          <div id="expiringList"></div>
         </div>
-        <div class="field">
-          <label>الخطة</label>
-          <select name="plan" id="quickPlanSelect" required></select>
+        <div class="adm-card">
+          <h3>📈 الطلبات حسب الحالة</h3>
+          <div id="statusBreakdown"></div>
         </div>
-        <button type="submit" class="btn-primary">تفعيل الاشتراك</button>
-      </form>
-      <p id="adminToast" class="admin-toast hidden"></p>
-    </div>
-
-    <div class="flex items-center justify-between gap-3 mb-4 mt-8 flex-wrap">
-      <h2 class="font-display text-lg">كل البائعين</h2>
-      <div class="flex items-center gap-2">
-        <input id="adminSearch" type="search" placeholder="بحث بالبريد أو الاسم…"
-               style="border:1px solid var(--c-line); border-radius:10px; padding:.5rem .8rem; background:var(--c-white)">
-        <button id="refreshBtn" class="btn-outline !py-2 !px-4">تحديث</button>
       </div>
-    </div>
 
-    <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
-      <table class="dash-table min-w-[640px]">
-        <thead>
-          <tr><th>البائع</th><th>الحالة</th><th>نهاية الاشتراك</th><th></th></tr>
-        </thead>
-        <tbody id="sellersBody"></tbody>
-      </table>
-      <p id="sellersEmpty" class="hidden text-center py-14 text-gray-400">لا يوجد بائعون مسجّلون بعد.</p>
-    </div>
+      <div class="grid lg:grid-cols-2 gap-4">
+        <div class="adm-card">
+          <h3>🆕 آخر الطلبات</h3>
+          <div id="recentOrders"></div>
+        </div>
+        <div class="adm-card">
+          <h3>👋 آخر المسجّلين</h3>
+          <div id="recentSellers"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== البائعون ===================== -->
+    <section class="adm-pane hidden" id="pane-sellers">
+      <div class="settings-card">
+        <h2 class="font-display text-lg mb-1">تفعيل اشتراك بالبريد الإلكتروني</h2>
+        <p class="text-sm text-gray-500 mb-5">اكتب بريد البائع بعد تأكيد الدفع، واختر نوع الخطة. إن كان له اشتراك فعّال يُمدَّد 30 يوماً بدل أن يُعاد من الصفر.</p>
+        <form id="quickForm" class="grid sm:grid-cols-[1fr_auto_auto] gap-3 items-end">
+          <div class="field">
+            <label>البريد الإلكتروني للبائع</label>
+            <input type="email" name="email" required placeholder="seller@example.com">
+          </div>
+          <div class="field">
+            <label>الخطة</label>
+            <select name="plan" id="quickPlanSelect" required></select>
+          </div>
+          <button type="submit" class="btn-primary">تفعيل الاشتراك</button>
+        </form>
+      </div>
+
+      <div class="adm-toolbar">
+        <input id="sellerSearch" type="search" class="adm-input grow" placeholder="بحث بالبريد أو الاسم أو الواتساب…">
+        <select id="sellerFilter" class="adm-select">
+          <option value="all">كل الحالات</option>
+          <option value="subscribed">مشترك</option>
+          <option value="trial">تجريبي</option>
+          <option value="expired">منتهي</option>
+          <option value="no_trial">بلا تجربة</option>
+        </select>
+        <button id="refreshBtn" class="btn-outline !py-2 !px-4">🔄 تحديث الكل</button>
+      </div>
+      <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
+        <table class="dash-table min-w-[720px]">
+          <thead><tr><th>البائع</th><th>الحالة</th><th>نهاية الاشتراك</th><th>منتجات / طلبات</th><th></th></tr></thead>
+          <tbody id="sellersBody"></tbody>
+        </table>
+        <p id="sellersEmpty" class="hidden text-center py-14 text-gray-400">لا يوجد بائعون مطابقون.</p>
+      </div>
+    </section>
+
+    <!-- ===================== المنتجات ===================== -->
+    <section class="adm-pane hidden" id="pane-products">
+      <div class="adm-toolbar">
+        <input id="productSearch" type="search" class="adm-input grow" placeholder="بحث باسم المنتج أو المتجر…">
+        <select id="productCat" class="adm-select"></select>
+        <select id="productType" class="adm-select">
+          <option value="all">رقمي + ملموس</option>
+          <option value="digital">⚡ رقمي</option>
+          <option value="physical">🚚 ملموس</option>
+        </select>
+        <select id="productStockFilter" class="adm-select">
+          <option value="all">كل المخزون</option>
+          <option value="low">منخفض (≤5)</option>
+          <option value="out">نافد</option>
+        </select>
+      </div>
+      <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
+        <table class="dash-table min-w-[760px]">
+          <thead><tr><th>المنتج</th><th>المتجر</th><th>السعر</th><th>المخزون</th><th></th></tr></thead>
+          <tbody id="productsBody"></tbody>
+        </table>
+        <p id="productsEmpty" class="hidden text-center py-14 text-gray-400">لا توجد منتجات مطابقة.</p>
+      </div>
+      <div class="pager" id="productsPager"></div>
+    </section>
+
+    <!-- ===================== الطلبات ===================== -->
+    <section class="adm-pane hidden" id="pane-orders">
+      <div class="adm-toolbar">
+        <input id="orderSearch" type="search" class="adm-input grow" placeholder="بحث باسم الزبون أو هاتفه أو رقم الطلب…">
+        <select id="orderStatus" class="adm-select"></select>
+        <select id="orderSeller" class="adm-select"></select>
+        <button id="exportOrdersBtn" class="btn-outline !py-2 !px-4">⬇️ تصدير CSV</button>
+      </div>
+      <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
+        <table class="dash-table min-w-[760px]">
+          <thead><tr><th>الطلب</th><th>الزبون</th><th>المتجر</th><th>المجموع</th><th>الحالة</th><th></th></tr></thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+        <p id="ordersEmpty" class="hidden text-center py-14 text-gray-400">لا توجد طلبات مطابقة.</p>
+      </div>
+      <div class="pager" id="ordersPager"></div>
+    </section>
+
+    <!-- ===================== الكوبونات ===================== -->
+    <section class="adm-pane hidden" id="pane-coupons">
+      <div class="adm-toolbar">
+        <input id="couponSearch" type="search" class="adm-input grow" placeholder="بحث بالرمز أو المتجر…">
+      </div>
+      <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
+        <table class="dash-table min-w-[640px]">
+          <thead><tr><th>الرمز</th><th>المتجر</th><th>الخصم</th><th>الاستعمال</th><th>الحالة</th><th></th></tr></thead>
+          <tbody id="couponsBody"></tbody>
+        </table>
+        <p id="couponsEmpty" class="hidden text-center py-14 text-gray-400">لا توجد كوبونات.</p>
+      </div>
+    </section>
+
+    <!-- ===================== الفريق والحظر ===================== -->
+    <section class="adm-pane hidden" id="pane-safety">
+      <div class="grid lg:grid-cols-2 gap-4">
+        <div class="adm-card">
+          <h3>👥 موظفو المتاجر <span class="text-sm opacity-60" id="staffCount"></span></h3>
+          <div class="overflow-x-auto"><table class="dash-table min-w-[360px]"><tbody id="staffBody"></tbody></table></div>
+          <p id="staffEmpty" class="hidden text-center py-8 text-gray-400">لا يوجد موظفون.</p>
+        </div>
+        <div class="adm-card">
+          <h3>🚫 القوائم السوداء <span class="text-sm opacity-60" id="blCount"></span></h3>
+          <div class="overflow-x-auto"><table class="dash-table min-w-[360px]"><tbody id="blBody"></tbody></table></div>
+          <p id="blEmpty" class="hidden text-center py-8 text-gray-400">القوائم فارغة.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== أدوات ===================== -->
+    <section class="adm-pane hidden" id="pane-tools">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="adm-card">
+          <h3>⬇️ تصدير البيانات</h3>
+          <div class="btn-row">
+            <button class="table-btn" id="exportSellersBtn">البائعون (CSV)</button>
+            <button class="table-btn" id="exportOrdersBtn2">كل الطلبات (CSV)</button>
+            <button class="table-btn" id="exportProductsBtn">كل المنتجات (CSV)</button>
+          </div>
+        </div>
+        <div class="adm-card">
+          <h3>📣 رسالة واتساب لمجموعة بائعين</h3>
+          <div class="field mb-2"><label>المجموعة</label>
+            <select id="bcGroup" class="adm-select w-full">
+              <option value="expiring">تنتهي اشتراكاتهم/تجاربهم خلال 3 أيام</option>
+              <option value="expired">منتهية</option>
+              <option value="trial">في التجربة</option>
+              <option value="subscribed">المشتركون</option>
+              <option value="all">الكل</option>
+            </select>
+          </div>
+          <div class="field mb-2"><label>نص الرسالة</label>
+            <textarea id="bcText" rows="3" class="adm-input w-full" placeholder="مرحباً {الاسم}، …"></textarea>
+          </div>
+          <button class="btn-primary !py-2" id="bcBuild">عرض روابط الإرسال</button>
+          <div id="bcList" class="mt-3 text-sm"></div>
+        </div>
+        <div class="adm-card md:col-span-2">
+          <h3>🧹 تنظيف</h3>
+          <p class="text-sm text-gray-500 mb-3">حذف منتجات بائعين لم يعودوا موجودين، وطلبات ملغاة قديمة، ومحاولات حظر تمت مشاهدتها.</p>
+          <div class="btn-row">
+            <button class="table-btn table-btn-danger" id="cleanOrphans">حذف المنتجات اليتيمة</button>
+            <button class="table-btn table-btn-danger" id="cleanCancelled">حذف الطلبات الملغاة (أقدم من 60 يوماً)</button>
+            <button class="table-btn table-btn-danger" id="cleanAttempts">حذف محاولات الحظر المشاهدة</button>
+          </div>
+        </div>
+      </div>
+    </section>
 
   </main>
+</div>
+
+<!-- نافذة عامة -->
+<div id="admModal" class="modal-overlay hidden">
+  <div class="modal-box adm-modal-box" id="admModalBox"></div>
 </div>
 
 <script type="module">
