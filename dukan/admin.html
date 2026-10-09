@@ -3,259 +3,1295 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>لوحة الإدارة — دكان</title>
+<title>لوحة القيادة والإدارة العليا — دكان</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="css/style.css">
 <style>
-  /* أنماط خاصة بلوحة الإدارة فقط — لا تمس style.css */
-  .adm-tabs { display:flex; gap:.4rem; overflow-x:auto; padding-bottom:.4rem; margin-bottom:1.5rem; border-bottom:1px solid var(--c-line); }
-  .adm-tab { padding:.6rem 1rem; border-radius:10px 10px 0 0; font-weight:700; font-size:.92rem; white-space:nowrap; color:#6B645A; border:0; background:transparent; cursor:pointer; position:relative; }
-  .adm-tab:hover { color:var(--c-primary-dark); }
-  .adm-tab.is-active { color:var(--c-primary-dark); background:var(--c-white); box-shadow:inset 0 -3px 0 var(--c-primary); }
-  .adm-tab .count { font-size:.7rem; background:var(--c-sand); border-radius:999px; padding:.1rem .45rem; margin-inline-start:.3rem; }
-  .adm-pane.hidden { display:none; }
-  .adm-input, .adm-select { border:1px solid var(--c-line); border-radius:10px; padding:.5rem .8rem; background:var(--c-white); font-size:.9rem; }
-  .adm-input:focus, .adm-select:focus { outline:none; border-color:var(--c-primary); }
-  .adm-toolbar { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; margin-bottom:1rem; }
-  .adm-toolbar .grow { flex:1; min-width:180px; }
-  .adm-card { background:var(--c-white); border:1px solid var(--c-line); border-radius:16px; padding:1.3rem; }
-  .adm-card h3 { font-weight:800; margin-bottom:.8rem; }
-  .adm-thumb { width:40px; height:40px; border-radius:8px; object-fit:cover; background:var(--c-sand); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .chip-warn { background:#FBF2E1; color:#7A5A17; }
-  .chip-blue { background:#E7EAF2; color:#2F3F73; }
-  .mini-row { display:flex; justify-content:space-between; gap:.6rem; padding:.5rem 0; border-bottom:1px dashed var(--c-line); font-size:.88rem; }
-  .mini-row:last-child { border-bottom:0; }
-  .bar { height:8px; border-radius:999px; background:var(--c-sand); overflow:hidden; }
-  .bar > span { display:block; height:100%; background:var(--c-primary); }
-  .adm-modal-box { max-width:640px; }
-  .adm-section { border-top:1px solid var(--c-line); padding-top:1rem; margin-top:1rem; }
-  .adm-section h4 { font-weight:800; font-size:.95rem; margin-bottom:.6rem; }
-  .btn-row { display:flex; flex-wrap:wrap; gap:.4rem; }
-  .btn-row .table-btn { margin-inline-start:0; }
-  .table-btn-ok { color:var(--c-primary-dark); border-color:#BEDFD3; background:#F3FAF7; }
-  .stock-input { width:70px; border:1px solid var(--c-line); border-radius:8px; padding:.25rem .4rem; font-size:.85rem; }
-  .pager { display:flex; justify-content:center; gap:.5rem; margin-top:1rem; align-items:center; font-size:.85rem; }
-  .kv { display:grid; grid-template-columns:auto 1fr; gap:.3rem .9rem; font-size:.88rem; }
-  .kv dt { opacity:.6; }
-  td .clip { max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* =========================================================
+     DUKAN — لوحة الإدارة الفاخرة والأسطورية
+     أنماط خاصة وحصرية لمركز التحكم الإداري
+     ========================================================= */
+
+  :root {
+    --adm-bg: #F7F9FA;
+    --adm-surface: #FFFFFF;
+    --adm-border: #E8ECEF;
+    --adm-border-subtle: #F1F4F6;
+    --adm-primary: #0E6B5C;
+    --adm-primary-dark: #094B40;
+    --adm-primary-light: #E8F5F2;
+    --adm-accent: #D9A441;
+    --adm-accent-dark: #B58428;
+    --adm-accent-light: #FEF8ED;
+    --adm-dark: #121F1B;
+    --adm-text-main: #111C18;
+    --adm-text-muted: #5E6E66;
+    --adm-text-sub: #8B9992;
+    --adm-danger: #E03E3E;
+    --adm-danger-light: #FDF1F1;
+    --adm-success: #12A150;
+    --adm-success-light: #EBF9F1;
+    --adm-warning: #DE8616;
+    --adm-warning-light: #FEF6EB;
+    --adm-indigo: #4F46E5;
+    --adm-indigo-light: #EEF2FF;
+    --adm-cyan: #0891B2;
+    --adm-cyan-light: #ECFEFF;
+
+    --adm-shadow-xs: 0 1px 2px rgba(17, 28, 24, 0.04);
+    --adm-shadow-sm: 0 2px 8px -2px rgba(17, 28, 24, 0.05), 0 1px 3px rgba(17, 28, 24, 0.03);
+    --adm-shadow-md: 0 8px 24px -4px rgba(17, 28, 24, 0.07), 0 2px 6px -1px rgba(17, 28, 24, 0.04);
+    --adm-shadow-lg: 0 16px 36px -6px rgba(17, 28, 24, 0.1), 0 4px 12px -2px rgba(17, 28, 24, 0.05);
+    --adm-shadow-xl: 0 24px 54px -10px rgba(17, 28, 24, 0.16);
+  }
+
+  body {
+    background-color: var(--adm-bg);
+    background-image: 
+      radial-gradient(ellipse 90% 45% at 50% -10%, rgba(14, 107, 92, 0.09) 0%, transparent 65%),
+      radial-gradient(circle at 95% 15%, rgba(217, 164, 65, 0.06) 0%, transparent 40%),
+      radial-gradient(circle at 5% 45%, rgba(14, 107, 92, 0.04) 0%, transparent 45%);
+    background-attachment: fixed;
+    color: var(--adm-text-main);
+    font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  /* ---------- الهيدر التنفيذي الفاخر ---------- */
+  .site-header {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(232, 236, 239, 0.85);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 4px 20px -8px rgba(17, 28, 24, 0.05);
+  }
+
+  .brand-mark {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #0E6B5C 0%, #08493E 100%);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.35rem;
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(14, 107, 92, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .brand-mark:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(14, 107, 92, 0.45);
+  }
+
+  .live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: #EBF9F1;
+    color: #12A150;
+    border: 1px solid #B8E8CD;
+    padding: .28rem .75rem;
+    border-radius: 999px;
+    font-size: .75rem;
+    font-weight: 800;
+    letter-spacing: .01em;
+  }
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #12A150;
+    box-shadow: 0 0 0 0 rgba(18, 161, 80, 0.7);
+    animation: livePulse 2s infinite;
+  }
+  @keyframes livePulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(18, 161, 80, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(18, 161, 80, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(18, 161, 80, 0); }
+  }
+
+  .admin-user-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    background: #F8FAFB;
+    border: 1px solid var(--adm-border);
+    padding: .35rem .85rem;
+    border-radius: 14px;
+    font-size: .84rem;
+  }
+  .admin-avatar-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #D9A441, #B58428);
+    color: #121F1B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: .8rem;
+    box-shadow: 0 2px 6px rgba(217, 164, 65, 0.3);
+  }
+
+  /* ---------- بانر الترحيب وشريط القيادة ---------- */
+  .cmd-hero {
+    background: linear-gradient(135deg, #FFFFFF 0%, #FBFDFD 100%);
+    border: 1px solid var(--adm-border);
+    border-radius: 22px;
+    padding: 1.5rem 1.8rem;
+    margin-bottom: 1.8rem;
+    box-shadow: var(--adm-shadow-sm);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+  }
+  .cmd-hero::before {
+    content: '';
+    position: absolute;
+    inset-inline-end: 0;
+    top: 0;
+    width: 260px;
+    height: 100%;
+    background: radial-gradient(circle at 100% 50%, rgba(14, 107, 92, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cmd-hero-title {
+    font-size: 1.35rem;
+    font-weight: 900;
+    color: var(--adm-text-main);
+    line-height: 1.25;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .cmd-hero-sub {
+    font-size: .88rem;
+    color: var(--adm-text-muted);
+    font-weight: 600;
+    margin-top: .35rem;
+  }
+
+  /* ---------- شريط التبويبات الفاخر المعلق (Floating Segmented Bar) ---------- */
+  .adm-tabs {
+    display: flex;
+    gap: .4rem;
+    padding: .45rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--adm-border);
+    border-radius: 18px;
+    margin-bottom: 2rem;
+    overflow-x: auto;
+    box-shadow: var(--adm-shadow-sm);
+    scrollbar-width: none;
+    position: relative;
+  }
+  .adm-tabs::-webkit-scrollbar { display: none; }
+
+  .adm-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .7rem 1.25rem;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: .92rem;
+    white-space: nowrap;
+    color: var(--adm-text-muted);
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+  .adm-tab:hover {
+    color: var(--adm-primary);
+    background: rgba(14, 107, 92, 0.06);
+  }
+  .adm-tab.is-active {
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #0E6B5C 0%, #094B40 100%);
+    box-shadow: 0 4px 16px rgba(14, 107, 92, 0.35);
+  }
+  .adm-tab .count {
+    font-size: .73rem;
+    font-weight: 900;
+    background: #EEF2F4;
+    color: var(--adm-text-muted);
+    border-radius: 999px;
+    padding: .15rem .55rem;
+    min-width: 22px;
+    text-align: center;
+    transition: all .2s ease;
+  }
+  .adm-tab.is-active .count {
+    background: rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+  }
+
+  .adm-pane.hidden { display: none; }
+
+  /* ---------- بطاقات المؤشرات الرئيسية (KPIs) الأسطورية ---------- */
+  .stat-card {
+    background: var(--adm-surface);
+    border: 1px solid var(--adm-border);
+    border-radius: 20px;
+    padding: 1.4rem 1.5rem;
+    box-shadow: var(--adm-shadow-sm);
+    transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(14, 107, 92, 0.6), transparent);
+    opacity: 0;
+    transition: opacity .25s ease;
+  }
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--adm-shadow-md);
+    border-color: rgba(14, 107, 92, 0.35);
+  }
+  .stat-card:hover::after {
+    opacity: 1;
+  }
+
+  .stat-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: .9rem;
+  }
+  .stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+  }
+  .stat-icon.ic-emerald { background: var(--adm-primary-light); color: var(--adm-primary); }
+  .stat-icon.ic-green   { background: var(--adm-success-light); color: var(--adm-success); }
+  .stat-icon.ic-amber   { background: var(--adm-warning-light); color: var(--adm-warning); }
+  .stat-icon.ic-rose    { background: var(--adm-danger-light); color: var(--adm-danger); }
+  .stat-icon.ic-gold    { background: var(--adm-accent-light); color: var(--adm-accent-dark); }
+  .stat-icon.ic-indigo  { background: var(--adm-indigo-light); color: var(--adm-indigo); }
+  .stat-icon.ic-cyan    { background: var(--adm-cyan-light); color: var(--adm-cyan); }
+
+  .stat-tag {
+    font-size: .72rem;
+    font-weight: 800;
+    padding: .2rem .6rem;
+    border-radius: 999px;
+    background: #F1F4F6;
+    color: var(--adm-text-muted);
+  }
+
+  .stat-value {
+    font-size: 1.95rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: var(--adm-text-main);
+    line-height: 1.2;
+    margin-bottom: .3rem;
+    font-feature-settings: "tnum";
+  }
+  .stat-label {
+    font-size: .84rem;
+    font-weight: 700;
+    color: var(--adm-text-muted);
+  }
+
+  /* ---------- البطاقات العامة والحاويات (Cards) ---------- */
+  .adm-card {
+    background: var(--adm-surface);
+    border: 1px solid var(--adm-border);
+    border-radius: 22px;
+    padding: 1.6rem;
+    box-shadow: var(--adm-shadow-sm);
+    transition: box-shadow .25s ease, border-color .25s ease;
+  }
+  .adm-card:hover {
+    box-shadow: var(--adm-shadow-md);
+  }
+  .adm-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    padding-bottom: .9rem;
+    border-bottom: 1px solid var(--adm-border-subtle);
+  }
+  .adm-card h3 {
+    font-weight: 900;
+    font-size: 1.08rem;
+    color: var(--adm-text-main);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: 0;
+  }
+
+  /* ---------- بطاقة التفعيل الفوري (VIP Settings Card) ---------- */
+  .settings-card {
+    background: linear-gradient(135deg, #FFFFFF 0%, #FCFDFD 100%);
+    border: 1px solid #D6E8E2;
+    border-radius: 22px;
+    padding: 1.8rem;
+    margin-bottom: 1.8rem;
+    box-shadow: var(--adm-shadow-sm);
+    position: relative;
+    overflow: hidden;
+  }
+  .settings-card::before {
+    content: '';
+    position: absolute;
+    inset-inline-end: 0;
+    top: 0;
+    width: 200px;
+    height: 100%;
+    background: radial-gradient(circle at 100% 20%, rgba(217, 164, 65, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ---------- أشرطة الأدوات والبحث (Toolbars) ---------- */
+  .adm-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    padding: .85rem 1.1rem;
+    border-radius: 18px;
+    border: 1px solid var(--adm-border);
+    box-shadow: var(--adm-shadow-xs);
+  }
+  .adm-toolbar .grow {
+    flex: 1;
+    min-width: 220px;
+  }
+
+  .adm-input, .adm-select {
+    border: 1px solid var(--adm-border);
+    border-radius: 12px;
+    padding: .65rem 1rem;
+    background: #FFFFFF;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--adm-text-main);
+    transition: all .15s ease;
+    box-shadow: 0 1px 2px rgba(17, 28, 24, 0.02);
+  }
+  .adm-input:focus, .adm-select:focus {
+    outline: none;
+    border-color: var(--adm-primary);
+    box-shadow: 0 0 0 3px rgba(14, 107, 92, 0.15);
+  }
+  .adm-select { cursor: pointer; }
+
+  /* ---------- حاويات وجداول البيانات (Tables) ---------- */
+  .table-box {
+    background: var(--adm-surface);
+    border: 1px solid var(--adm-border);
+    border-radius: 22px;
+    overflow-x: auto;
+    box-shadow: var(--adm-shadow-sm);
+  }
+  table.dash-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  table.dash-table th {
+    background: #F8FAFB;
+    color: var(--adm-text-muted);
+    font-size: .8rem;
+    font-weight: 800;
+    letter-spacing: .02em;
+    padding: 1rem 1.15rem;
+    border-bottom: 1px solid var(--adm-border);
+    text-align: right;
+    white-space: nowrap;
+  }
+  table.dash-table td {
+    padding: 1.05rem 1.15rem;
+    border-bottom: 1px solid var(--adm-border-subtle);
+    font-size: .91rem;
+    color: var(--adm-text-main);
+    vertical-align: middle;
+    transition: background .15s ease;
+  }
+  table.dash-table tr:hover td {
+    background: #F9FBFA;
+  }
+  table.dash-table tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .adm-thumb {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #F1F4F6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    border: 1px solid var(--adm-border);
+  }
+
+  /* ---------- أزرار الإجراءات الفاخرة ---------- */
+  .table-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .82rem;
+    font-weight: 700;
+    padding: .42rem .85rem;
+    border-radius: 10px;
+    border: 1px solid var(--adm-border);
+    background: #FFFFFF;
+    color: #33423C;
+    cursor: pointer;
+    transition: all .15s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(17, 28, 24, 0.04);
+    text-decoration: none;
+    margin-inline-start: .3rem;
+  }
+  .table-btn:hover {
+    background: #F8FAFB;
+    border-color: #CAD5CF;
+    color: var(--adm-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(17, 28, 24, 0.07);
+  }
+  .table-btn-ok {
+    color: #0E6B5C !important;
+    background: #ECFDF5 !important;
+    border-color: #B2ECD4 !important;
+  }
+  .table-btn-ok:hover {
+    background: #D5F9EB !important;
+    border-color: #8CE0BD !important;
+    color: #08493E !important;
+    transform: translateY(-1px);
+  }
+  .table-btn-danger {
+    color: #E03E3E !important;
+    background: #FEF2F2 !important;
+    border-color: #FDC7C7 !important;
+  }
+  .table-btn-danger:hover {
+    background: #FEE4E4 !important;
+    border-color: #FAABAB !important;
+    color: #B92626 !important;
+    transform: translateY(-1px);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    background: linear-gradient(135deg, #0E6B5C 0%, #08493E 100%);
+    color: #FFFFFF;
+    font-weight: 800;
+    font-size: .92rem;
+    padding: .75rem 1.6rem;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(14, 107, 92, 0.3);
+    transition: all .2s ease;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(14, 107, 92, 0.4);
+    background: linear-gradient(135deg, #0A5549 0%, #063A31 100%);
+  }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+    border: 1px solid var(--adm-border);
+    color: var(--adm-text-main);
+    font-weight: 700;
+    font-size: .88rem;
+    padding: .65rem 1.3rem;
+    border-radius: 12px;
+    background: #FFFFFF;
+    cursor: pointer;
+    transition: all .15s ease;
+    box-shadow: var(--adm-shadow-xs);
+  }
+  .btn-outline:hover {
+    border-color: var(--adm-primary);
+    color: var(--adm-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--adm-shadow-sm);
+  }
+
+  /* ---------- شارات الحالة المتميزة (Chips) ---------- */
+  .admin-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    font-size: .76rem;
+    font-weight: 800;
+    padding: .3rem .8rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    letter-spacing: .01em;
+  }
+  .chip-active {
+    background: #EBF9F1;
+    color: #0E753B;
+    border: 1px solid #B4E8CA;
+  }
+  .chip-trial {
+    background: #FEF8ED;
+    color: #9A6615;
+    border: 1px solid #F8E2BC;
+  }
+  .chip-expired {
+    background: #FDF1F1;
+    color: #B92626;
+    border: 1px solid #FBCACA;
+  }
+  .chip-none {
+    background: #F1F4F6;
+    color: #556660;
+    border: 1px solid #DAE2E0;
+  }
+  .chip-warn {
+    background: #FFF8E6;
+    color: #8C590E;
+    border: 1px solid #FBE6AB;
+  }
+  .chip-blue {
+    background: #EEF2FF;
+    color: #3730A3;
+    border: 1px solid #C7D2FE;
+  }
+
+  /* ---------- الصفوف المصغرة وأشرطة التقدم (Mini Rows & Progress) ---------- */
+  .mini-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: .8rem;
+    padding: .75rem .4rem;
+    border-bottom: 1px solid var(--adm-border-subtle);
+    font-size: .89rem;
+    border-radius: 10px;
+    transition: background .15s ease;
+  }
+  .mini-row:hover {
+    background: #F8FAFB;
+  }
+  .mini-row:last-child {
+    border-bottom: 0;
+  }
+
+  .bar {
+    height: 9px;
+    border-radius: 999px;
+    background: #EEF2F4;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar > span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #10B981 0%, #0E6B5C 100%);
+    transition: width .5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* ---------- حقول التعديل المضمنة في الجداول ---------- */
+  .stock-input {
+    width: 76px;
+    border: 1px solid var(--adm-border);
+    border-radius: 9px;
+    padding: .35rem .5rem;
+    font-size: .88rem;
+    font-weight: 800;
+    text-align: center;
+    background: #FFFFFF;
+    color: var(--adm-text-main);
+    transition: all .15s ease;
+  }
+  .stock-input:focus {
+    outline: none;
+    border-color: var(--adm-primary);
+    box-shadow: 0 0 0 2px rgba(14, 107, 92, 0.15);
+  }
+
+  .status-select {
+    border: 1px solid var(--adm-border);
+    border-radius: 10px;
+    padding: .42rem .75rem;
+    font-size: .83rem;
+    font-weight: 800;
+    background: #F8FAFB;
+    color: var(--adm-text-main);
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .status-select:focus {
+    outline: none;
+    border-color: var(--adm-primary);
+    background: #FFFFFF;
+    box-shadow: 0 0 0 2px rgba(14, 107, 92, 0.15);
+  }
+
+  .pager {
+    display: flex;
+    justify-content: center;
+    gap: .75rem;
+    margin-top: 1.5rem;
+    align-items: center;
+    font-size: .88rem;
+    font-weight: 800;
+    color: var(--adm-text-muted);
+  }
+
+  /* ---------- النافذة المنبثقة الإدارية (Modal) ---------- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(18, 31, 27, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    z-index: 100;
+  }
+  .adm-modal-box {
+    background: #FFFFFF;
+    border-radius: 24px;
+    padding: 2.2rem;
+    width: 100%;
+    max-width: 680px;
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: var(--adm-shadow-xl);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    animation: admModalPop .2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes admModalPop {
+    from { opacity: 0; transform: scale(0.96) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .kv {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: .6rem 1.4rem;
+    font-size: .9rem;
+    background: #F8FAFB;
+    padding: 1.2rem 1.4rem;
+    border-radius: 16px;
+    border: 1px solid var(--adm-border);
+  }
+  .kv dt {
+    font-weight: 700;
+    color: var(--adm-text-muted);
+  }
+  .kv dd {
+    font-weight: 800;
+    color: var(--adm-text-main);
+  }
+
+  .adm-section {
+    border-top: 1px solid var(--adm-border);
+    padding-top: 1.3rem;
+    margin-top: 1.3rem;
+  }
+  .adm-section h4 {
+    font-weight: 900;
+    font-size: 1rem;
+    margin-bottom: .85rem;
+    color: var(--adm-text-main);
+  }
+
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+  }
+  .btn-row .table-btn {
+    margin-inline-start: 0;
+  }
+
+  td .clip {
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ---------- إشعار التنبيه العائم (Executive Toast) ---------- */
+  .admin-toast {
+    position: fixed;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 120;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(16px);
+    border: 1px solid #B8E8CD;
+    box-shadow: 0 16px 40px -8px rgba(14, 107, 92, 0.25), 0 4px 12px -2px rgba(17, 28, 24, 0.06);
+    border-radius: 16px;
+    padding: .85rem 1.6rem;
+    font-size: .94rem;
+    font-weight: 800;
+    color: #0B6032;
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    animation: admToastDrop .25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .admin-toast.is-error {
+    border-color: #FBCACA;
+    color: #B92626;
+    box-shadow: 0 16px 40px -8px rgba(224, 62, 62, 0.25), 0 4px 12px -2px rgba(17, 28, 24, 0.06);
+  }
+  @keyframes admToastDrop {
+    from { opacity: 0; transform: translate(-50%, -15px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+
+  /* ---------- تحسينات إضافية للتفاصيل الدقيقة ---------- */
+  .tile-cat {
+    font-size: .78rem;
+    color: var(--adm-text-muted);
+    font-weight: 700;
+    margin-top: .15rem;
+  }
+  table.dash-table .font-medium {
+    font-weight: 800;
+    color: var(--adm-text-main);
+  }
+
+  .field label {
+    font-size: .82rem;
+    font-weight: 800;
+    color: var(--adm-text-muted);
+    margin-bottom: .4rem;
+    display: block;
+  }
+  .field input, .field select, .field textarea {
+    border: 1px solid var(--adm-border);
+    border-radius: 12px;
+    padding: .65rem .95rem;
+    background: #FFFFFF;
+    color: var(--adm-text-main);
+    font-size: .9rem;
+    font-weight: 600;
+    outline: none;
+    transition: all .15s ease;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--adm-primary);
+    box-shadow: 0 0 0 3px rgba(14, 107, 92, 0.15);
+  }
+
+  /* أزرار الواتساب المتميزة */
+  a.table-btn[href*="wa.me"] {
+    color: #075E54 !important;
+    background: #E8F8F5 !important;
+    border-color: #A3E4D7 !important;
+  }
+  a.table-btn[href*="wa.me"]:hover {
+    background: #D1F2EB !important;
+    border-color: #76D7C4 !important;
+    color: #054D44 !important;
+  }
+
+  /* زر إغلاق النوافذ المنبثقة */
+  button[data-act="close-modal"] {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .88rem;
+    font-weight: 900;
+    color: var(--adm-text-muted);
+    border: 1px solid var(--adm-border);
+    background: #F8FAFB;
+    transition: all .2s ease;
+  }
+  button[data-act="close-modal"]:hover {
+    background: #FEE2E2;
+    border-color: #FCA5A5;
+    color: #DC2626;
+    transform: rotate(90deg);
+  }
+
+  /* منطقة الخطر في نافذة البائع */
+  .adm-section:has([data-act="delete-seller"]) {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 18px;
+    padding: 1.3rem;
+    margin-top: 1.5rem;
+  }
 </style>
 </head>
 <body>
 
 <div id="adminShell" class="hidden">
+  <!-- الهيدر الفاخر -->
   <header class="site-header">
-    <div class="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
-      <a href="index.html" class="flex items-center gap-3">
-        <span class="brand-mark">د</span>
-        <span class="font-display text-lg">دكان — الإدارة</span>
-      </a>
+    <div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="flex items-center gap-3 group">
+          <span class="brand-mark">د</span>
+          <div>
+            <div class="font-display text-lg leading-tight flex items-center gap-2">
+              <span class="font-black">دكان</span>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold border border-emerald-200">الإدارة المركزية</span>
+            </div>
+            <div class="text-xs text-slate-400 font-semibold">غرفة التحكم والعمليات المباشرة</div>
+          </div>
+        </a>
+      </div>
+
       <div class="flex items-center gap-3 text-sm">
-        <a href="dashboard.html" class="text-gray-500 hover:underline hidden sm:inline">لوحة البائع</a>
-        <span class="text-gray-500 hidden md:inline" id="adminEmail">—</span>
-        <button id="logoutBtn" class="table-btn table-btn-danger">تسجيل الخروج</button>
+        <span class="live-pill hidden sm:inline-flex"><span class="live-dot"></span> مباشر والبيانات متصلة</span>
+        <a href="dashboard.html" class="table-btn hidden sm:inline-flex" title="الانتقال للوحة البائع">
+          <span>🏪</span>
+          <span>لوحة البائع</span>
+        </a>
+        <a href="store.html" target="_blank" rel="noopener" class="table-btn hidden md:inline-flex" title="زيارة المتجر">
+          <span>🏬</span>
+          <span>المتجر</span>
+        </a>
+        <div class="admin-user-pill hidden md:inline-flex">
+          <span class="admin-avatar-badge">🛡️</span>
+          <span class="font-bold text-slate-700" id="adminEmail">—</span>
+        </div>
+        <button id="logoutBtn" class="table-btn table-btn-danger">
+          <span>تسجيل الخروج</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-5 py-8">
+  <main class="max-w-7xl mx-auto px-5 py-8">
 
-    <p id="adminToast" class="admin-toast hidden" style="position:sticky; top:.5rem; z-index:60; margin-top:0; margin-bottom:1rem"></p>
+    <!-- رسائل التنبيه العائمة -->
+    <p id="adminToast" class="admin-toast hidden"></p>
 
+    <!-- بانر القيادة الترحيبي -->
+    <div class="cmd-hero">
+      <div>
+        <h1 class="cmd-hero-title">
+          <span>🚀</span>
+          <span>مركز القيادة والإشراف العام</span>
+        </h1>
+        <p class="cmd-hero-sub">المراقبة اللحظية للبائعين، الاشتراكات الشهرية، حركة المنتجات وتدفق الطلبات بدقة متناهية.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="document.querySelector('[data-tab=\'sellers\']').click()" class="btn-primary !py-2.5 !px-5 text-sm">
+          <span>⚡ تفعيل اشتراك فوري</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- شريط التبويبات الفاخر -->
     <nav class="adm-tabs" id="admTabs">
-      <button class="adm-tab is-active" data-tab="overview">📊 نظرة عامة</button>
+      <button class="adm-tab is-active" data-tab="overview">📊 نظرة عامة شاملة</button>
       <button class="adm-tab" data-tab="sellers">🏪 البائعون <span class="count" id="cntSellers">0</span></button>
       <button class="adm-tab" data-tab="products">📦 المنتجات <span class="count" id="cntProducts">0</span></button>
       <button class="adm-tab" data-tab="orders">🧾 الطلبات <span class="count" id="cntOrders">0</span></button>
       <button class="adm-tab" data-tab="coupons">🏷️ الكوبونات <span class="count" id="cntCoupons">0</span></button>
       <button class="adm-tab" data-tab="safety">🛡️ الفريق والحظر</button>
-      <button class="adm-tab" data-tab="tools">🧰 أدوات</button>
+      <button class="adm-tab" data-tab="tools">🧰 أدوات وصيانة</button>
     </nav>
 
-    <!-- ===================== نظرة عامة ===================== -->
+    <!-- ===================== 1. نظرة عامة ===================== -->
     <section class="adm-pane" id="pane-overview">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="stat-card"><p class="stat-value" id="statTotal">0</p><p class="stat-label">إجمالي البائعين</p></div>
-        <div class="stat-card"><p class="stat-value" id="statSubscribed">0</p><p class="stat-label">مشترك فعّال</p></div>
-        <div class="stat-card"><p class="stat-value" id="statTrial">0</p><p class="stat-label">في الفترة التجريبية</p></div>
-        <div class="stat-card"><p class="stat-value" id="statExpired">0</p><p class="stat-label">منتهي / بلا تجربة</p></div>
-        <div class="stat-card"><p class="stat-value" id="statMrr">0</p><p class="stat-label">إيراد الاشتراكات الفعّالة (شهرياً)</p></div>
-        <div class="stat-card"><p class="stat-value" id="statProducts">0</p><p class="stat-label">إجمالي المنتجات</p></div>
-        <div class="stat-card"><p class="stat-value" id="statOrders">0</p><p class="stat-label">إجمالي الطلبات</p></div>
-        <div class="stat-card"><p class="stat-value" id="statGmv">0</p><p class="stat-label">قيمة الطلبات (بدون الملغاة)</p></div>
+      <!-- شبكة المؤشرات الاستراتيجية 8 KPI -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- 1. إجمالي البائعين -->
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-icon ic-emerald">🏪</div>
+            <span class="stat-tag">المنصة</span>
+          </div>
+          <p class="stat-value" id="statTotal">0</p>
+          <p class="stat-label">إجمالي البائعين</p>
+        </div>
+
+        <!-- 2. مشترك فعال -->
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-icon ic-green">💎</div>
+            <span class="stat-tag" style="background:#EBF9F1; color:#0E753B">نشط</span>
+          </div>
+          <p class="stat-value" id="statSubscribed">0</p>
+          <p class="stat-label">مشترك فعّال</p>
+        </div>
+
+        <!-- 3. في الفترة التجريبية -->
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-icon ic-amber">⏳</div>
+            <span class="stat-tag" style="background:#FEF8ED; color:#9A6615">تجربة</span>
+          </div>
+          <p class="stat-value" id="statTrial">0</p>
+          <p class="stat-label">في الفترة التجريبية</p>
+        </div>
+
+        <!-- 4. منتهي / بلا تجربة -->
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-icon ic-rose">⚠️</div>
+            <span class="stat-tag" style="background:#FDF1F1; color:#B92626">متوقف</span>
+          </div>
+          <p class="stat-value" id="statExpired">0</p>
+          <p class="stat-label">منتهي / بلا تجربة</p>
+        </div>
+
+        <!-- 5. MRR -->
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-icon ic-gold">💰</div>
+            <span class="stat-tag" style="background:#FEF8ED; color:#B58428">MRR</span>
+          </div>
+          <p class="stat-value" id="statMrr">0</p>
+          <p class="stat-label">إيراد الاشتراكات الفعّالة (شهرياً)</p>
+        </div>
+
+        <!-- 6. إجمالي المنتجات -->
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-icon ic-indigo">📦</div>
+            <span class="stat-tag">الكتالوج</span>
+          </div>
+          <p class="stat-value" id="statProducts">0</p>
+          <p class="stat-label">إجمالي المنتجات المعروضة</p>
+        </div>
+
+        <!-- 7. إجمالي الطلبات -->
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-icon ic-cyan">🧾</div>
+            <span class="stat-tag">العمليات</span>
+          </div>
+          <p class="stat-value" id="statOrders">0</p>
+          <p class="stat-label">إجمالي الطلبات المستلمة</p>
+        </div>
+
+        <!-- 8. GMV -->
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div class="stat-icon ic-emerald">📈</div>
+            <span class="stat-tag" style="background:#EBF9F1; color:#0E753B">GMV</span>
+          </div>
+          <p class="stat-value" id="statGmv">0</p>
+          <p class="stat-label">قيمة التداولات (بدون الملغاة)</p>
+        </div>
       </div>
 
-      <div class="grid lg:grid-cols-2 gap-4 mb-6">
+      <!-- بطاقات التحليل والتنبيهات المباشرة -->
+      <div class="grid lg:grid-cols-2 gap-6 mb-6">
         <div class="adm-card">
-          <h3>⏳ اشتراكات/تجارب تنتهي خلال 3 أيام</h3>
+          <div class="adm-card-head">
+            <h3><span>⏳</span> اشتراكات وتجارب تنتهي خلال 3 أيام</h3>
+            <span class="text-xs text-slate-400 font-bold">تنبيهات فورية</span>
+          </div>
           <div id="expiringList"></div>
         </div>
         <div class="adm-card">
-          <h3>📈 الطلبات حسب الحالة</h3>
+          <div class="adm-card-head">
+            <h3><span>📈</span> توزيع الطلبات حسب الحالة</h3>
+            <span class="text-xs text-slate-400 font-bold">نسب الإنجاز</span>
+          </div>
           <div id="statusBreakdown"></div>
         </div>
       </div>
 
-      <div class="grid lg:grid-cols-2 gap-4">
+      <div class="grid lg:grid-cols-2 gap-6">
         <div class="adm-card">
-          <h3>🆕 آخر الطلبات</h3>
+          <div class="adm-card-head">
+            <h3><span>🆕</span> آخر الطلبات المستلمة في المنصة</h3>
+            <button onclick="document.querySelector('[data-tab=\'orders\']').click()" class="table-btn text-xs">عرض الكل</button>
+          </div>
           <div id="recentOrders"></div>
         </div>
         <div class="adm-card">
-          <h3>👋 آخر المسجّلين</h3>
+          <div class="adm-card-head">
+            <h3><span>👋</span> أحدث البائعين المنضمين للمنصة</h3>
+            <button onclick="document.querySelector('[data-tab=\'sellers\']').click()" class="table-btn text-xs">عرض الكل</button>
+          </div>
           <div id="recentSellers"></div>
         </div>
       </div>
     </section>
 
-    <!-- ===================== البائعون ===================== -->
+    <!-- ===================== 2. البائعون ===================== -->
     <section class="adm-pane hidden" id="pane-sellers">
       <div class="settings-card">
-        <h2 class="font-display text-lg mb-1">تفعيل اشتراك بالبريد الإلكتروني</h2>
-        <p class="text-sm text-gray-500 mb-5">اكتب بريد البائع بعد تأكيد الدفع، واختر نوع الخطة. إن كان له اشتراك فعّال يُمدَّد 30 يوماً بدل أن يُعاد من الصفر.</p>
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm">⚡</span>
+            <h2 class="font-display text-lg text-slate-900">تفعيل أو تمديد اشتراك بائع فورياً بالبريد</h2>
+          </div>
+          <span class="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200">ترقية سريعة ومباشرة</span>
+        </div>
+        <p class="text-sm text-slate-500 mb-5">اكتب بريد البائع بعد تأكيد الدفع، واختر نوع الخطة. إن كان له اشتراك فعّال يُمدَّد 30 يوماً إضافية بدل أن يُعاد حسابه من الصفر.</p>
         <form id="quickForm" class="grid sm:grid-cols-[1fr_auto_auto] gap-3 items-end">
           <div class="field">
-            <label>البريد الإلكتروني للبائع</label>
-            <input type="email" name="email" required placeholder="seller@example.com">
+            <label class="text-xs font-bold text-slate-700">البريد الإلكتروني للبائع</label>
+            <input type="email" name="email" required placeholder="seller@example.com" class="adm-input w-full">
           </div>
           <div class="field">
-            <label>الخطة</label>
-            <select name="plan" id="quickPlanSelect" required></select>
+            <label class="text-xs font-bold text-slate-700">الخطة المطلوبة</label>
+            <select name="plan" id="quickPlanSelect" required class="adm-select w-full"></select>
           </div>
-          <button type="submit" class="btn-primary">تفعيل الاشتراك</button>
+          <button type="submit" class="btn-primary !py-2.5 !px-6 whitespace-nowrap">✨ تفعيل الاشتراك</button>
         </form>
       </div>
 
       <div class="adm-toolbar">
-        <input id="sellerSearch" type="search" class="adm-input grow" placeholder="بحث بالبريد أو الاسم أو الواتساب…">
+        <div class="relative grow min-w-[220px]">
+          <input id="sellerSearch" type="search" class="adm-input w-full pr-9" placeholder="بحث بالبريد الإلكتروني، اسم المتجر، أو رقم الواتساب…">
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+        </div>
         <select id="sellerFilter" class="adm-select">
           <option value="all">كل الحالات</option>
-          <option value="subscribed">مشترك</option>
-          <option value="trial">تجريبي</option>
-          <option value="expired">منتهي</option>
+          <option value="subscribed">مشترك فعّال</option>
+          <option value="trial">في الفترة التجريبية</option>
+          <option value="expired">منتهي الصلاحية</option>
           <option value="no_trial">بلا تجربة</option>
         </select>
-        <button id="refreshBtn" class="btn-outline !py-2 !px-4">🔄 تحديث الكل</button>
+        <button id="refreshBtn" class="table-btn table-btn-ok !py-2.5 !px-4">🔄 تحديث الكل</button>
       </div>
-      <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
-        <table class="dash-table min-w-[720px]">
-          <thead><tr><th>البائع</th><th>الحالة</th><th>نهاية الاشتراك</th><th>منتجات / طلبات</th><th></th></tr></thead>
+
+      <div class="table-box">
+        <table class="dash-table min-w-[760px]">
+          <thead>
+            <tr>
+              <th>البائع والمتجر</th>
+              <th>حالة الحساب</th>
+              <th>نهاية الاشتراك</th>
+              <th>المنتجات / الطلبات</th>
+              <th class="text-left">الإجراءات</th>
+            </tr>
+          </thead>
           <tbody id="sellersBody"></tbody>
         </table>
-        <p id="sellersEmpty" class="hidden text-center py-14 text-gray-400">لا يوجد بائعون مطابقون.</p>
+        <p id="sellersEmpty" class="hidden text-center py-14 text-slate-400 font-bold">لا يوجد بائعون مطابقون لخيارات البحث.</p>
       </div>
     </section>
 
-    <!-- ===================== المنتجات ===================== -->
+    <!-- ===================== 3. المنتجات ===================== -->
     <section class="adm-pane hidden" id="pane-products">
       <div class="adm-toolbar">
-        <input id="productSearch" type="search" class="adm-input grow" placeholder="بحث باسم المنتج أو المتجر…">
+        <div class="relative grow min-w-[220px]">
+          <input id="productSearch" type="search" class="adm-input w-full pr-9" placeholder="بحث باسم المنتج، المتجر المالك…">
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+        </div>
         <select id="productCat" class="adm-select"></select>
         <select id="productType" class="adm-select">
-          <option value="all">رقمي + ملموس</option>
+          <option value="all">كل الأنواع (رقمي + ملموس)</option>
           <option value="digital">⚡ رقمي</option>
           <option value="physical">🚚 ملموس</option>
         </select>
         <select id="productStockFilter" class="adm-select">
-          <option value="all">كل المخزون</option>
-          <option value="low">منخفض (≤5)</option>
-          <option value="out">نافد</option>
+          <option value="all">كل حالات المخزون</option>
+          <option value="low">⚠️ منخفض (≤5)</option>
+          <option value="out">⛔ نافد تماماً</option>
         </select>
       </div>
-      <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
-        <table class="dash-table min-w-[760px]">
-          <thead><tr><th>المنتج</th><th>المتجر</th><th>السعر</th><th>المخزون</th><th></th></tr></thead>
+
+      <div class="table-box">
+        <table class="dash-table min-w-[780px]">
+          <thead>
+            <tr>
+              <th>المنتج والتصنيف</th>
+              <th>المتجر المالك</th>
+              <th>السعر</th>
+              <th>المخزون السريع</th>
+              <th class="text-left">الإجراءات</th>
+            </tr>
+          </thead>
           <tbody id="productsBody"></tbody>
         </table>
-        <p id="productsEmpty" class="hidden text-center py-14 text-gray-400">لا توجد منتجات مطابقة.</p>
+        <p id="productsEmpty" class="hidden text-center py-14 text-slate-400 font-bold">لا توجد منتجات مطابقة للبحث أو الفلترة.</p>
       </div>
       <div class="pager" id="productsPager"></div>
     </section>
 
-    <!-- ===================== الطلبات ===================== -->
+    <!-- ===================== 4. الطلبات ===================== -->
     <section class="adm-pane hidden" id="pane-orders">
       <div class="adm-toolbar">
-        <input id="orderSearch" type="search" class="adm-input grow" placeholder="بحث باسم الزبون أو هاتفه أو رقم الطلب…">
+        <div class="relative grow min-w-[220px]">
+          <input id="orderSearch" type="search" class="adm-input w-full pr-9" placeholder="بحث برقم الطلب، اسم الزبون، أو رقم الهاتف…">
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+        </div>
         <select id="orderStatus" class="adm-select"></select>
         <select id="orderSeller" class="adm-select"></select>
-        <button id="exportOrdersBtn" class="btn-outline !py-2 !px-4">⬇️ تصدير CSV</button>
+        <button id="exportOrdersBtn" class="table-btn !py-2.5 !px-4">⬇️ تصدير CSV (المفلتر)</button>
       </div>
-      <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
-        <table class="dash-table min-w-[760px]">
-          <thead><tr><th>الطلب</th><th>الزبون</th><th>المتجر</th><th>المجموع</th><th>الحالة</th><th></th></tr></thead>
+
+      <div class="table-box">
+        <table class="dash-table min-w-[800px]">
+          <thead>
+            <tr>
+              <th>رقم وتاريخ الطلب</th>
+              <th>الزبون وبيانات التواصل</th>
+              <th>المتجر</th>
+              <th>المجموع</th>
+              <th>حالة الطلب</th>
+              <th class="text-left">الإجراءات</th>
+            </tr>
+          </thead>
           <tbody id="ordersBody"></tbody>
         </table>
-        <p id="ordersEmpty" class="hidden text-center py-14 text-gray-400">لا توجد طلبات مطابقة.</p>
+        <p id="ordersEmpty" class="hidden text-center py-14 text-slate-400 font-bold">لا توجد طلبات مطابقة للمعايير المحددة.</p>
       </div>
       <div class="pager" id="ordersPager"></div>
     </section>
 
-    <!-- ===================== الكوبونات ===================== -->
+    <!-- ===================== 5. الكوبونات ===================== -->
     <section class="adm-pane hidden" id="pane-coupons">
       <div class="adm-toolbar">
-        <input id="couponSearch" type="search" class="adm-input grow" placeholder="بحث بالرمز أو المتجر…">
+        <div class="relative grow min-w-[220px]">
+          <input id="couponSearch" type="search" class="adm-input w-full pr-9" placeholder="بحث برمز الكوبون أو المتجر…">
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+        </div>
       </div>
-      <div class="bg-white rounded-2xl border overflow-x-auto" style="border-color: var(--c-line)">
-        <table class="dash-table min-w-[640px]">
-          <thead><tr><th>الرمز</th><th>المتجر</th><th>الخصم</th><th>الاستعمال</th><th>الحالة</th><th></th></tr></thead>
+
+      <div class="table-box">
+        <table class="dash-table min-w-[680px]">
+          <thead>
+            <tr>
+              <th>رمز الكوبون</th>
+              <th>المتجر المالك</th>
+              <th>الخصم</th>
+              <th>معدل الاستعمال</th>
+              <th>الحالة</th>
+              <th class="text-left">الإجراءات</th>
+            </tr>
+          </thead>
           <tbody id="couponsBody"></tbody>
         </table>
-        <p id="couponsEmpty" class="hidden text-center py-14 text-gray-400">لا توجد كوبونات.</p>
+        <p id="couponsEmpty" class="hidden text-center py-14 text-slate-400 font-bold">لا توجد كوبونات مسجلة في النظام.</p>
       </div>
     </section>
 
-    <!-- ===================== الفريق والحظر ===================== -->
+    <!-- ===================== 6. الفريق والحظر ===================== -->
     <section class="adm-pane hidden" id="pane-safety">
-      <div class="grid lg:grid-cols-2 gap-4">
+      <div class="grid lg:grid-cols-2 gap-6">
         <div class="adm-card">
-          <h3>👥 موظفو المتاجر <span class="text-sm opacity-60" id="staffCount"></span></h3>
+          <div class="adm-card-head">
+            <h3><span>👥</span> موظفو المتاجر <span class="text-sm font-bold text-slate-400" id="staffCount"></span></h3>
+            <span class="text-xs text-slate-400 font-bold">صلاحيات الفريق</span>
+          </div>
           <div class="overflow-x-auto"><table class="dash-table min-w-[360px]"><tbody id="staffBody"></tbody></table></div>
-          <p id="staffEmpty" class="hidden text-center py-8 text-gray-400">لا يوجد موظفون.</p>
+          <p id="staffEmpty" class="hidden text-center py-8 text-slate-400 font-bold">لا يوجد موظفون مسجلون حالياً.</p>
         </div>
+
         <div class="adm-card">
-          <h3>🚫 القوائم السوداء <span class="text-sm opacity-60" id="blCount"></span></h3>
+          <div class="adm-card-head">
+            <h3><span>🚫</span> القوائم السوداء للمتاجر <span class="text-sm font-bold text-slate-400" id="blCount"></span></h3>
+            <span class="text-xs text-slate-400 font-bold">الأرقام المحظورة</span>
+          </div>
           <div class="overflow-x-auto"><table class="dash-table min-w-[360px]"><tbody id="blBody"></tbody></table></div>
-          <p id="blEmpty" class="hidden text-center py-8 text-gray-400">القوائم فارغة.</p>
+          <p id="blEmpty" class="hidden text-center py-8 text-slate-400 font-bold">القوائم السوداء فارغة تماماً ✓</p>
         </div>
       </div>
     </section>
 
-    <!-- ===================== أدوات ===================== -->
+    <!-- ===================== 7. أدوات ===================== -->
     <section class="adm-pane hidden" id="pane-tools">
-      <div class="grid md:grid-cols-2 gap-4">
+      <div class="grid md:grid-cols-2 gap-6">
         <div class="adm-card">
-          <h3>⬇️ تصدير البيانات</h3>
+          <div class="adm-card-head">
+            <h3><span>⬇️</span> تصدير البيانات الشامل (CSV)</h3>
+            <span class="text-xs text-slate-400 font-bold">نسخ احتياطي وتقارير</span>
+          </div>
+          <p class="text-sm text-slate-500 mb-4">تصدير جداول البيانات الكاملة بتنسيق Excel/CSV مع دعم كامل للترميز العربي UTF-8.</p>
           <div class="btn-row">
-            <button class="table-btn" id="exportSellersBtn">البائعون (CSV)</button>
-            <button class="table-btn" id="exportOrdersBtn2">كل الطلبات (CSV)</button>
-            <button class="table-btn" id="exportProductsBtn">كل المنتجات (CSV)</button>
+            <button class="table-btn !py-2.5 !px-4" id="exportSellersBtn">📊 سجل البائعين (CSV)</button>
+            <button class="table-btn !py-2.5 !px-4" id="exportOrdersBtn2">🧾 كل الطلبات (CSV)</button>
+            <button class="table-btn !py-2.5 !px-4" id="exportProductsBtn">📦 كل المنتجات (CSV)</button>
           </div>
         </div>
+
         <div class="adm-card">
-          <h3>📣 رسالة واتساب لمجموعة بائعين</h3>
-          <div class="field mb-2"><label>المجموعة</label>
+          <div class="adm-card-head">
+            <h3><span>📣</span> بث رسائل واتساب جماعية للبائعين</h3>
+            <span class="text-xs text-slate-400 font-bold">تواصل مباشر</span>
+          </div>
+          <div class="field mb-3">
+            <label class="text-xs font-bold text-slate-700">المجموعة المستهدفة</label>
             <select id="bcGroup" class="adm-select w-full">
-              <option value="expiring">تنتهي اشتراكاتهم/تجاربهم خلال 3 أيام</option>
-              <option value="expired">منتهية</option>
-              <option value="trial">في التجربة</option>
-              <option value="subscribed">المشتركون</option>
-              <option value="all">الكل</option>
+              <option value="expiring">⏳ تنتهي اشتراكاتهم/تجاربهم خلال 3 أيام</option>
+              <option value="expired">⚠️ اشتراكاتهم منتهية</option>
+              <option value="trial">🧪 في الفترة التجريبية</option>
+              <option value="subscribed">💎 المشتركون النشطون</option>
+              <option value="all">👥 جميع البائعين المسجلين</option>
             </select>
           </div>
-          <div class="field mb-2"><label>نص الرسالة</label>
-            <textarea id="bcText" rows="3" class="adm-input w-full" placeholder="مرحباً {الاسم}، …"></textarea>
+          <div class="field mb-3">
+            <label class="text-xs font-bold text-slate-700">نص الرسالة (استخدم {الاسم} لتخصيص الاسم)</label>
+            <textarea id="bcText" rows="3" class="adm-input w-full" placeholder="مرحباً {الاسم}، نود إعلامك بأن اشتراكك في دكان..."></textarea>
           </div>
-          <button class="btn-primary !py-2" id="bcBuild">عرض روابط الإرسال</button>
-          <div id="bcList" class="mt-3 text-sm"></div>
+          <button class="btn-primary !py-2.5 w-full justify-center" id="bcBuild">⚡ إنشاء روابط المحادثات المباشرة</button>
+          <div id="bcList" class="mt-4 text-sm max-h-48 overflow-y-auto"></div>
         </div>
-        <div class="adm-card md:col-span-2">
-          <h3>🧹 تنظيف</h3>
-          <p class="text-sm text-gray-500 mb-3">حذف منتجات بائعين لم يعودوا موجودين، وطلبات ملغاة قديمة، ومحاولات حظر تمت مشاهدتها.</p>
+
+        <div class="adm-card md:col-span-2 border-red-200 bg-red-50/20">
+          <div class="adm-card-head border-red-200">
+            <h3 class="text-red-700"><span>🧹</span> الصيانة والتنظيف المتقدم لقواعد البيانات</h3>
+            <span class="text-xs text-red-600 font-bold px-2 py-0.5 rounded-full bg-red-100 border border-red-200">عمليات حساسة</span>
+          </div>
+          <p class="text-sm text-slate-600 mb-4">حذف منتجات بائعين لم يعودوا موجودين (المنتجات اليتيمة)، وحذف الطلبات الملغاة القديمة، ومحاولات الحظر التي تم الاطلاع عليها لتحسين أداء المنصة.</p>
           <div class="btn-row">
-            <button class="table-btn table-btn-danger" id="cleanOrphans">حذف المنتجات اليتيمة</button>
-            <button class="table-btn table-btn-danger" id="cleanCancelled">حذف الطلبات الملغاة (أقدم من 60 يوماً)</button>
-            <button class="table-btn table-btn-danger" id="cleanAttempts">حذف محاولات الحظر المشاهدة</button>
+            <button class="table-btn table-btn-danger !py-2.5 !px-4" id="cleanOrphans">🗑️ حذف المنتجات اليتيمة</button>
+            <button class="table-btn table-btn-danger !py-2.5 !px-4" id="cleanCancelled">🗑️ حذف الطلبات الملغاة (أقدم من 60 يوماً)</button>
+            <button class="table-btn table-btn-danger !py-2.5 !px-4" id="cleanAttempts">🗑️ حذف محاولات الحظر المشاهدة</button>
           </div>
         </div>
       </div>
@@ -264,7 +1300,7 @@
   </main>
 </div>
 
-<!-- نافذة عامة -->
+<!-- نافذة عامة منبثقة تفاعلية (Modal) -->
 <div id="admModal" class="modal-overlay hidden">
   <div class="modal-box adm-modal-box" id="admModalBox"></div>
 </div>
