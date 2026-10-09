@@ -79,8 +79,10 @@ export const SubGuard = (() => {
   }
 
   /**
-   * يتحقق من حالة الاشتراك ويعرض الحظر عند الحاجة.
-   * يُرجع البائع إن كان الوصول مسموحاً، أو null إن تم الحظر.
+   * يتحقق من الجلسة وحالة الاشتراك ويعرض الحظر عند الحاجة.
+   * - صاحب المتجر: يرى متجره.
+   * - الموظف: يرى متجر صاحب العمل بصلاحيات محدودة (موسوم بـ __isStaff).
+   * يُرجع كائن المتجر الفعّال، أو null إن تم الحظر/التحويل.
    */
   async function enforce() {
     const user = await Auth.waitForAuthReady();
@@ -88,10 +90,42 @@ export const SubGuard = (() => {
       window.location.href = "login.html";
       return null;
     }
-    const seller = await DB.getSellerById(user.uid);
+
+    const session = await DB.resolveSession();
+    if (!session) {
+      window.location.href = "login.html";
+      return null;
+    }
+
+    // تفضيل الدور (يخزّنه المستخدم عند التبديل بين متجره وفريق العمل)
+    const role = localStorage.getItem("dukan_role_" + user.uid);
+
+    // وضع الموظف: الافتراضي للموظفين، إلا إذا اختار صراحةً فتح متجره الخاص
+    if (session.isStaff && (role !== "owner" || !session.ownSeller)) {
+      const staffSeller = {
+        ...session.teamSeller,
+        __isStaff: true,
+        __staff: session.staff,
+        __ownSeller: session.ownSeller || null,
+        __uid: user.uid,
+      };
+      const status = Auth.getAccountStatus(staffSeller);
+      if (status.state === "expired" || status.state === "no_trial") {
+        showBlockScreen(staffSeller, status);
+        return null;
+      }
+      return staffSeller;
+    }
+
+    const seller = session.ownSeller;
     if (!seller) {
       window.location.href = "login.html";
       return null;
+    }
+    // إن كان أيضاً موظفاً في متجر آخر، نُعلّم الكائن لإظهار زرّ التبديل
+    if (session.isStaff) {
+      seller.__alsoStaff = { ...session.staff, storeName: session.teamSeller.name };
+      seller.__uid = user.uid;
     }
 
     const status = Auth.getAccountStatus(seller);

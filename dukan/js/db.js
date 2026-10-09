@@ -221,15 +221,114 @@ export const DB = (() => {
     const snap = await getDocs(q);
     return snap.docs.map(snapToObj).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }
+
+  // فهرس العضوية: مستند مفتاحه بريد الموظف، يقراه الموظف بنفسه،
+  // وتستعمله قواعد Firestore للتحقق من أن المستخدم موظف فعّال في متجر معيّن.
+  // يكتبه صاحب المتجر فقط (عند إضافة/تعديل/حذف موظف).
+  function staffMemberId(email) {
+    return (email || "").trim().toLowerCase();
+  }
+  function memberPayload(data) {
+    return {
+      email: staffMemberId(data.email),
+      name: data.name || "",
+      sellerIds: [data.sellerId],
+      permissions: data.permissions || [],
+      active: data.active !== false,
+      updatedAt: Date.now(),
+    };
+  }
   async function addStaff(data) {
     const ref = await addDoc(collection(db, "staff"), { ...data, createdAt: Date.now() });
+    if (staffMemberId(data.email)) {
+      try {
+        await setDoc(doc(db, "members", staffMemberId(data.email)), {
+          ...memberPayload(data), staffId: ref.id, createdAt: Date.now(),
+        });
+      } catch (err) {
+        console.warn("[addStaff] تعذّر تحديث فهرس العضوية:", err.message);
+      }
+    }
     return ref.id;
   }
-  async function updateStaff(id, data) {
+  async function updateStaff(id, data, email) {
     await updateDoc(doc(db, "staff", id), data);
+    if (staffMemberId(email)) {
+      const patch = {};
+      if ("active" in data) patch.active = data.active !== false;
+      if ("permissions" in data) patch.permissions = data.permissions || [];
+      if ("name" in data) patch.name = data.name || "";
+      if (Object.keys(patch).length) {
+        try {
+          await updateDoc(doc(db, "members", staffMemberId(email)), { ...patch, updatedAt: Date.now() });
+        } catch (err) {
+          console.warn("[updateStaff] تعذّر مزامنة الفهرس:", err.message);
+        }
+      }
+    }
   }
-  async function deleteStaff(id) {
+  async function deleteStaff(id, email) {
     await deleteDoc(doc(db, "staff", id));
+    if (staffMemberId(email)) {
+      try {
+        await deleteDoc(doc(db, "members", staffMemberId(email)));
+      } catch (err) {
+        console.warn("[deleteStaff] تعذّر حذف فهرس العضوية:", err.message);
+      }
+    }
+  }
+  // يضمن وجود فهرس عضوية لكل الموظفين الحاليين (تُستدعى عند فتح تبويب الفريق)
+  async function syncStaffMembers(sellerId) {
+    const list = await getStaff(sellerId);
+    for (const s of list) {
+      if (!staffMemberId(s.email)) continue;
+      try {
+        await setDoc(
+          doc(db, "members", staffMemberId(s.email)),
+          { ...memberPayload(s), staffId: s.id, updatedAt: Date.now() },
+          { merge: true },
+        );
+      } catch (err) {
+        console.warn("[syncStaffMembers]", err.message);
+      }
+    }
+  }
+  // يقرأ عضوية المستخدم الحالي ببريده
+  async function getMyMembership(email) {
+    if (!staffMemberId(email)) return null;
+    const snap = await getDoc(doc(db, "members", staffMemberId(email)));
+    return snap.exists() ? snapToObj(snap) : null;
+  }
+  // يحلّ جلسة المستخدم الحالي: صاحب متجر؟ موظف في متجر؟ (يُستعمل عند الدخول والتشغيل)
+  async function resolveSession() {
+    const user = auth.currentUser;
+    if (!user) return null;
+    const email = staffMemberId(user.email);
+    const [ownSeller, member] = await Promise.all([
+      getSellerById(user.uid),
+      getMyMembership(email).catch((err) => {
+        console.warn("[resolveSession] تعذّر قراءة العضوية:", err.message);
+        return null;
+      }),
+    ]);
+
+    let staff = null;
+    let teamSeller = null;
+    if (member && member.active !== false && Array.isArray(member.sellerIds) && member.sellerIds.length) {
+      teamSeller = await getSellerById(member.sellerIds[0]);
+      // نتجاهل الحالة إذا كان "المتجر" هو متجر المستخدم نفسه
+      if (teamSeller && teamSeller.id !== user.uid) {
+        staff = {
+          id: member.staffId || null,
+          name: member.name || "",
+          email,
+          permissions: member.permissions || [],
+          active: true,
+          sellerId: teamSeller.id,
+        };
+      }
+    }
+    return { user, email, ownSeller, staff, teamSeller, isStaff: !!(staff && teamSeller) };
   }
 
   // ---------- Blacklist (القائمة السوداء) ----------
@@ -553,6 +652,7 @@ export const DB = (() => {
     getSellerById, getSellerByEmail, createSellerProfile, updateSellerProfile, getCurrentSeller,
     isAdminEmail, getAllSellers, activateSubscription, extendSubscription, cancelSubscription,
     getStaff, addStaff, updateStaff, deleteStaff,
+    syncStaffMembers, getMyMembership, resolveSession, staffMemberId,
     normalizePhone, getBlacklist, addToBlacklist, removeFromBlacklist, isPhoneBlacklisted,
     logBlacklistAttempt, getBlacklistAttempts, markAttemptsSeen,
     getLowStockProducts, decrementStock,

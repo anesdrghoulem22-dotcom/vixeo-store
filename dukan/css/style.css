@@ -321,7 +321,10 @@ body {
 }
 .status-trial { background: #FBF2E1; border: 1px solid #EFD9A6; color: #7A5A17; }
 .status-active { background: #E7F3EF; border: 1px solid #BEDFD3; color: var(--c-primary-dark); }
+.status-staff { background: #EEF2FF; border: 1px solid #C7D2FE; color: #3730A3; }
 .status-link { font-weight: 700; text-decoration: underline; }
+button.status-link { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit; }
+.status-badge { display: inline-block; font-size: .8rem; font-weight: 700; color: var(--c-primary-dark); background: var(--c-sand); border-radius: 999px; padding: .2rem .7rem; }
 
 .stat-card {
   border: 1px solid var(--c-line);

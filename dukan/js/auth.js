@@ -88,8 +88,11 @@ export const Auth = (() => {
       await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
       const cred = await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), password);
       const seller = await DB.getSellerById(cred.user.uid);
-      if (!seller) throw new Error("تعذّر العثور على بيانات المتجر لهذا الحساب.");
-      return seller;
+      if (seller) return seller;
+      // ليس صاحب متجر؟ ربما هو موظف مسجّل ببريده في متجر غيره
+      const member = await DB.getMyMembership(cred.user.email || "").catch(() => null);
+      if (member && member.active !== false) return { role: "staff", email: cred.user.email };
+      throw new Error("تعذّر العثور على متجر مرتبط بهذا الحساب. تأكد أن صاحب المتجر أضاف بريدك إلى فريق العمل.");
     } catch (err) {
       console.error("[Auth.login] failed:", err);
       throw new Error(err.code ? friendlyError(err) : err.message);
@@ -159,8 +162,14 @@ export const Auth = (() => {
       return null;
     }
     const seller = await DB.getSellerById(user.uid);
-    if (!seller || !canAccessDashboard(seller)) {
-      window.location.href = "pricing.html?expired=1";
+    // موظف بلا متجر خاص → لا يحق له تعديل إعدادات متجر صاحب العمل
+    if (!seller) {
+      window.location.href = "dashboard.html";
+      return null;
+    }
+    if (!canAccessDashboard(seller)) {
+      const member = await DB.getMyMembership(user.email || "").catch(() => null);
+      window.location.href = member && member.active !== false ? "dashboard.html" : "pricing.html?expired=1";
       return null;
     }
     return seller;
@@ -169,8 +178,14 @@ export const Auth = (() => {
   async function redirectIfLoggedIn() {
     const user = await waitForAuthReady();
     if (!user) return;
-    const seller = await DB.getSellerById(user.uid);
-    window.location.href = seller && canAccessDashboard(seller) ? "dashboard.html" : "pricing.html";
+    const session = await DB.resolveSession();
+    if (!session) return;
+    // الموظف يدخل مباشرة إلى لوحة فريق العمل
+    if (session.isStaff) {
+      window.location.href = "dashboard.html";
+      return;
+    }
+    window.location.href = session.ownSeller && canAccessDashboard(session.ownSeller) ? "dashboard.html" : "pricing.html";
   }
 
   return {

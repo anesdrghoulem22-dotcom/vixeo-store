@@ -1,0 +1,27 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Cap,Segoe UI,76,&H00FFFFFF,&H000000FF,&H00FFFFFF,&H59000000,-1,0,0,0,100,100,1,0,3,7,4,2,80,80,60,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:02.69,0:00:07.29,Cap,,0,0,0,,{\move(540,1762,540,1700,0,240)\fad(200,200)}تبيع أونلاين؟
+Dialogue: 0,0:00:07.83,0:00:09.19,Cap,,0,0,0,,{\move(540,1762,540,1700,0,200)\fad(160,160)}دكان… جالك!
+Dialogue: 0,0:00:09.50,0:00:12.12,Cap,,0,0,0,,{\move(540,1762,540,1700,0,220)\fad(180,180)}منصّة جزائرية للبيع عبر الإنترنت
+Dialogue: 0,0:00:12.61,0:00:13.23,Cap,,0,0,0,,{\move(540,1762,540,1700,0,160)\fad(130,130)}متجرك في دقائق!
+Dialogue: 0,0:00:13.55,0:00:15.87,Cap,,0,0,0,,{\move(540,1762,540,1700,0,200)\fad(160,160)}أنشئ متجرك بلا برمجة
+Dialogue: 0,0:00:16.18,0:00:17.78,Cap,,0,0,0,,{\move(540,1762,540,1700,0,200)\fad(160,160)}وأضف منتجاتك بسهولة
+Dialogue: 0,0:00:18.11,0:00:20.57,Cap,,0,0,0,,{\move(540,1762,540,1700,0,200)\fad(160,160)}شارك رابط متجرك
+Dialogue: 0,0:00:20.91,0:00:24.13,Cap,,0,0,0,,{\move(540,1762,540,1700,0,220)\fad(180,180)}والطلبيات تصلك على واتساب
+Dialogue: 0,0:00:24.58,0:00:26.72,Cap,,0,0,0,,{\move(540,1762,540,1700,0,200)\fad(160,160)}كوبونات وإحصائيات ذكية
+Dialogue: 0,0:00:27.08,0:00:29.02,Cap,,0,0,0,,{\move(540,1762,540,1700,0,200)\fad(160,160)}تحكّم كامل في متجرك
+Dialogue: 0,0:00:29.38,0:00:31.34,Cap,,0,0,0,,{\move(540,1762,540,1700,0,200)\fad(160,160)}باقات: أساسي • بلس • برو
+Dialogue: 0,0:00:31.71,0:00:33.83,Cap,,0,0,0,,{\move(540,1762,540,1700,0,220)\fad(180,180)}أول 7 أيام مجانًا!
+Dialogue: 0,0:00:34.16,0:00:35.47,Cap,,0,0,0,,{\move(540,1762,540,1700,0,200)\fad(160,200)}سجّل الآن مجانًا!

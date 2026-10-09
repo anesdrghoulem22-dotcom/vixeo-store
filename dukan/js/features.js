@@ -102,9 +102,14 @@ export const Features = (() => {
         <span>${p.label}</span>
       </label>`).join("");
 
+    // نضمن وجود فهرس عضوية لكل الموظفين (حتى القديمين) حتى يتعرّف عليهم النظام عند دخولهم
+    DB.syncStaffMembers(seller.id).catch((err) => console.warn("[staff.sync]", err.message));
+
+    let staffList = [];
     async function render() {
       tbody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-gray-400">جارٍ التحميل…</td></tr>`;
       const list = await DB.getStaff(seller.id);
+      staffList = list;
       empty.classList.toggle("hidden", list.length > 0);
       tbody.innerHTML = list.map((s) => {
         const labels = (s.permissions || [])
@@ -176,13 +181,14 @@ export const Features = (() => {
       const row = e.target.closest("tr[data-id]");
       if (!row) return;
       const id = row.dataset.id;
+      const member = staffList.find((x) => x.id === id);
       try {
         if (e.target.closest("[data-del]")) {
           if (!confirm("حذف هذا الموظف نهائياً؟")) return;
-          await DB.deleteStaff(id);
+          await DB.deleteStaff(id, member?.email);
         } else if (e.target.closest("[data-toggle]")) {
           const isActive = e.target.textContent.trim() === "إيقاف";
-          await DB.updateStaff(id, { active: !isActive });
+          await DB.updateStaff(id, { active: !isActive }, member?.email);
         } else return;
         await render();
       } catch (err) {

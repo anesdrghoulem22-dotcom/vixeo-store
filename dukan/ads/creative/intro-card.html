@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+  html,body{margin:0;padding:0;width:1080px;height:1920px;overflow:hidden}
+  .stage{
+    width:1080px;height:1920px;position:relative;
+    background:
+      radial-gradient(120% 90% at 80% 10%, rgba(217,164,65,.30), transparent 55%),
+      radial-gradient(90% 70% at 0% 100%, rgba(22,185,129,.35), transparent 60%),
+      linear-gradient(160deg,#0E6B5C 0%,#0B5648 45%,#062A23 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-family:'Segoe UI',Tahoma,Arial,sans-serif;color:#fff;
+  }
+  .glow{position:absolute;width:900px;height:900px;border-radius:50%;
+    background:radial-gradient(circle, rgba(217,164,65,.22), transparent 62%);
+    top:-180px;right:-180px;filter:blur(10px)}
+  .ring{position:absolute;width:1300px;height:1300px;border-radius:50%;
+    border:2px solid rgba(255,255,255,.06);top:50%;left:50%;transform:translate(-50%,-50%)}
+  .ring2{width:900px;height:900px;border-color:rgba(217,164,65,.10)}
+  .logo{width:340px;height:340px;object-fit:contain;filter:drop-shadow(0 24px 60px rgba(0,0,0,.45));z-index:2}
+  .name{font-size:190px;font-weight:900;letter-spacing:-2px;margin-top:24px;z-index:2;
+    text-shadow:0 10px 40px rgba(0,0,0,.4)}
+  .latin{font-size:46px;letter-spacing:22px;color:#F2C55C;font-weight:800;margin-top:6px;z-index:2;padding-right:22px}
+  .tag{font-size:56px;font-weight:700;color:rgba(255,255,255,.92);margin-top:70px;z-index:2}
+  .bar{width:220px;height:8px;border-radius:99px;margin-top:44px;z-index:2;
+    background:linear-gradient(90deg,#F4CD6B,#D9A441)}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="glow"></div>
+    <div class="ring"></div>
+    <div class="ring ring2"></div>
+    <img class="logo" src="/img/logo.svg" alt="Ø¯ÙƒØ§Ù†">
+    <div class="name">Ø¯ÙƒØ§Ù†</div>
+    <div class="latin">DUKAN STORE</div>
+    <div class="bar"></div>
+    <div class="tag">Ø¨ÙŠØ¹ Ø¨Ø°ÙƒØ§Ø¡â€¦ Ø§Ø±Ø¨Ø­ Ø£ÙƒØ«Ø±</div>
+  </div>
+</body>
+</html>
+

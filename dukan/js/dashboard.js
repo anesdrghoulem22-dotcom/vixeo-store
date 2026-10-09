@@ -62,12 +62,96 @@ export const Dashboard = (() => {
     else el.textContent = seller.name.trim().charAt(0) || "د";
   }
 
+  // التبديل بين متجرك الخاص وفريق العمل (يُحفظ لكل مستخدم)
+  function switchRole(seller, role) {
+    if (seller && seller.__uid) localStorage.setItem("dukan_role_" + seller.__uid, role);
+    window.location.reload();
+  }
+
+  // وضع الموظف: ترويسة + إخفاء الأقسام غير المسموح بها + تقييد الإجراءات
+  function applyStaffMode(seller) {
+    const staff = seller.__staff || {};
+    const perms = new Set(staff.permissions || []);
+    const can = (p) => perms.has(p);
+
+    document.getElementById("sellerName").textContent = staff.name || "موظف";
+    const av = document.getElementById("sellerAvatar");
+    if (av) av.textContent = (staff.name || "م").trim().charAt(0) || "م";
+    const greet = document.getElementById("topbarGreeting");
+    if (greet) greet.textContent = "موظف في";
+
+    const banner = document.getElementById("statusBanner");
+    banner.innerHTML = `<div class="status-banner status-staff">
+      <span>👤 أنت مسجّل كموظف في متجر «<strong>${Store.escapeHtml(seller.name)}</strong>» — صلاحياتك محدودة حسب ما منحه لك صاحب المتجر.</span>
+      ${seller.__ownSeller ? `<button type="button" id="switchToOwner" class="status-link">فتح متجري الخاص</button>` : ""}
+    </div>`;
+    const switchBtn = document.getElementById("switchToOwner");
+    if (switchBtn) switchBtn.addEventListener("click", () => switchRole(seller, "owner"));
+
+    // الأقسام المسموح بها حسب الصلاحيات الممنوحة
+    const allowed = new Set();
+    if (can("analytics_view")) allowed.add("overview");
+    if (can("products_view") || can("products_manage")) allowed.add("products");
+    if (can("orders_view") || can("orders_update")) { allowed.add("orders"); allowed.add("customers"); }
+    if (can("analytics_view")) allowed.add("analytics");
+    if (can("coupons_manage")) allowed.add("coupons");
+    if (can("blacklist_manage")) allowed.add("blacklist");
+
+    // أقسام محظورة دائماً على الموظف (إدارة الفريق/الإعدادات/التسويق)
+    const alwaysHidden = ["staff", "delivery", "pixels"];
+    document.querySelectorAll("[data-tab-btn]").forEach((btn) => {
+      const t = btn.dataset.tabBtn;
+      if (alwaysHidden.includes(t) || !allowed.has(t)) btn.classList.add("hidden");
+    });
+    document.querySelectorAll("[data-tab-panel]").forEach((panel) => {
+      const t = panel.dataset.tabPanel;
+      if (alwaysHidden.includes(t) || !allowed.has(t)) panel.classList.add("hidden");
+    });
+
+    document.getElementById("adminLink")?.classList.add("hidden");
+    document.querySelector('a[href="settings.html"]')?.classList.add("hidden");
+
+    // تفعيل أول تبويب مسموح
+    const allBtns = [...document.querySelectorAll("[data-tab-btn]")];
+    allBtns.forEach((b) => b.classList.remove("is-active"));
+    document.querySelectorAll("[data-tab-panel]").forEach((p) => p.classList.add("hidden"));
+    const first = allBtns.find((b) => !b.classList.contains("hidden"));
+    if (first) {
+      first.classList.add("is-active");
+      document.querySelector(`[data-tab-panel="${first.dataset.tabBtn}"]`)?.classList.remove("hidden");
+    }
+
+    seller.__canManageProducts = can("products_manage");
+    seller.__canUpdateOrders = can("orders_update");
+  }
+
+  function renderAlsoStaffBanner(seller) {
+    const banner = document.getElementById("statusBanner");
+    const storeName = seller.__alsoStaff?.storeName || "";
+    banner.insertAdjacentHTML("beforeend", `<div class="status-banner status-staff">
+      <span>👥 أنت أيضاً موظف في متجر «<strong>${Store.escapeHtml(storeName)}</strong>».</span>
+      <button type="button" id="switchToStaff" class="status-link">الدخول كموظف</button>
+    </div>`);
+    document.getElementById("switchToStaff")?.addEventListener("click", () => switchRole(seller, "staff"));
+  }
+
   async function initShell() {
     // حارس الاشتراك: يعرض شاشة حظر حمراء بدل التحويل الصامت
     const seller = await SubGuard.enforce();
     if (!seller) return null;
-    document.getElementById("sellerName").textContent = seller.name;
-    renderAvatar(seller);
+
+    const isStaff = !!seller.__isStaff;
+
+    if (isStaff) {
+      applyStaffMode(seller);
+    } else {
+      document.getElementById("sellerName").textContent = seller.name;
+      renderAvatar(seller);
+      const greet = document.getElementById("topbarGreeting");
+      if (greet) greet.textContent = "مرحباً بعودتك،";
+      renderStatusBanner(seller);
+      if (seller.__alsoStaff) renderAlsoStaffBanner(seller);
+    }
 
     const storeLink = `${location.origin}${location.pathname.replace(/[^/]*$/, "")}store.html?seller=${seller.id}`;
     const viewStoreLink = document.getElementById("viewStoreLink");
@@ -83,11 +167,10 @@ export const Dashboard = (() => {
       });
     }
 
-    // رابط لوحة الإدارة يظهر فقط لبريد المشرف
+    // رابط لوحة الإدارة يظهر فقط لبريد المشرف (وليس للموظف)
     const adminLink = document.getElementById("adminLink");
-    if (adminLink && DB.isAdminEmail(seller.email)) adminLink.classList.remove("hidden");
+    if (adminLink && !isStaff && DB.isAdminEmail(seller.email)) adminLink.classList.remove("hidden");
 
-    renderStatusBanner(seller);
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) {
       logoutBtn.addEventListener("click", async () => {
@@ -102,6 +185,7 @@ export const Dashboard = (() => {
   async function renderProductsTable(seller) {
     const tbody = document.getElementById("productsBody");
     const empty = document.getElementById("productsEmpty");
+    const canManage = seller.__canManageProducts !== false;
     tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-gray-400">جارٍ التحميل…</td></tr>`;
     const products = await DB.getProductsBySeller(seller.id);
 
@@ -127,8 +211,9 @@ export const Dashboard = (() => {
               : p.stock
         }</td>
         <td class="text-left">
-          <button class="table-btn" data-edit>تعديل</button>
-          <button class="table-btn table-btn-danger" data-delete>حذف</button>
+          ${canManage ? `
+            <button class="table-btn" data-edit>تعديل</button>
+            <button class="table-btn table-btn-danger" data-delete>حذف</button>` : `<span class="tile-cat">عرض فقط</span>`}
         </td>
       </tr>`).join("");
   }
@@ -182,6 +267,11 @@ export const Dashboard = (() => {
 
   function initProductsTab(seller) {
     renderProductsTable(seller);
+    // موظف بصلاحية عرض فقط → لا إضافة/تعديل/حذف
+    if (seller.__canManageProducts === false) {
+      document.getElementById("addProductBtn")?.classList.add("hidden");
+      return;
+    }
     document.getElementById("addProductBtn").addEventListener("click", () => openProductModal(seller));
     document.getElementById("closeModalBtn").addEventListener("click", closeProductModal);
     document.getElementById("cancelModalBtn").addEventListener("click", closeProductModal);
@@ -272,6 +362,7 @@ export const Dashboard = (() => {
   async function renderOrders(seller) {
     const tbody = document.getElementById("ordersBody");
     const empty = document.getElementById("ordersEmpty");
+    const canUpdate = seller.__canUpdateOrders !== false;
     tbody.innerHTML = `<tr><td colspan="6" class="text-center py-10 text-gray-400">جارٍ التحميل…</td></tr>`;
     const orders = await DB.getOrdersForSeller(seller.id);
     cachedOrders = orders;
@@ -287,9 +378,9 @@ export const Dashboard = (() => {
           <td class="text-sm">${Store.escapeHtml(itemsLabel)}</td>
           <td>${money(subtotal)}</td>
           <td>
-            <select class="status-select" data-status>
+            ${canUpdate ? `<select class="status-select" data-status>
               ${DB.ORDER_STATUSES.map((s) => `<option value="${s}" ${s === o.status ? "selected" : ""}>${s}</option>`).join("")}
-            </select>
+            </select>` : `<span class="status-badge">${Store.escapeHtml(o.status)}</span>`}
           </td>
           <td><button class="table-btn" data-view>عرض</button></td>
         </tr>`;
@@ -337,6 +428,7 @@ export const Dashboard = (() => {
       if (order) openOrderModal(order);
     });
     document.getElementById("ordersBody").addEventListener("change", async (e) => {
+      if (seller.__canUpdateOrders === false) return;
       const select = e.target.closest("[data-status]");
       if (!select) return;
       const id = e.target.closest("tr").dataset.id;
@@ -565,16 +657,39 @@ export const Dashboard = (() => {
     });
   }
 
+  // يشغّل فقط الأقسام التي يملك الموظف صلاحيتها
+  async function initStaffFeatures(seller) {
+    const perms = new Set(seller.__staff?.permissions || []);
+    const tasks = [];
+    if (perms.has("blacklist_manage")) tasks.push(["blacklist", Features.initBlacklist]);
+    if (perms.has("coupons_manage")) tasks.push(["coupons", Features.initCoupons]);
+    if (perms.has("analytics_view")) tasks.push(["analytics", Features.initAnalytics]);
+    for (const [name, fn] of tasks) {
+      try {
+        await fn(seller);
+      } catch (err) {
+        console.error(`[Staff.features.${name}]`, err);
+      }
+    }
+  }
+
   async function initDashboard() {
     const seller = await initShell();
     if (!seller) return;
+
+    const isStaff = !!seller.__isStaff;
     initTabs();
     initProductsTab(seller);
     initOrdersTab(seller);
-    initDeliveryTab(seller);
+    if (!isStaff) initDeliveryTab(seller);
     initTopbar(seller);
-    // الميزات المتقدمة: موظفون، قائمة سوداء، كوبونات، بيكسل، إحصائيات
-    Features.initAll(seller);
+
+    if (isStaff) {
+      await initStaffFeatures(seller);
+    } else {
+      // الميزات المتقدمة: موظفون، قائمة سوداء، كوبونات، بيكسل، إحصائيات
+      Features.initAll(seller);
+    }
 
     const [myProducts, myOrders] = await Promise.all([DB.getProductsBySeller(seller.id), DB.getOrdersForSeller(seller.id)]);
     const revenue = myOrders.reduce((sum, o) => sum + o.items.reduce((s, it) => s + it.price * it.qty, 0), 0);

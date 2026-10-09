@@ -26,6 +26,38 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid == sellerId;
     }
 
+    // ===== فهرس عضوية الموظفين (members/{email}) =====
+    // يكتبه صاحب المتجر عند إضافة موظف، ويقراه الموظف ببريده،
+    // وتستعمله القواعد للتحقق من أن المستخدم موظف فعّال في متجر واحد فقط.
+    function myEmail() {
+      return request.auth != null ? request.auth.token.email : null;
+    }
+    function memberExists() {
+      return myEmail() != null
+             && exists(/databases/$(database)/documents/members/$(myEmail()));
+    }
+    function isStaffOfAny(sellerIds) {
+      return memberExists()
+             && get(/databases/$(database)/documents/members/$(myEmail())).data.active == true
+             && get(/databases/$(database)/documents/members/$(myEmail())).data.sellerIds.hasAny(sellerIds);
+    }
+    function isStaffOf(sellerId) {
+      return isStaffOfAny([sellerId]);
+    }
+    // صاحب المتجر أو موظف فيه
+    function canManage(sellerId) {
+      return isOwner(sellerId) || isStaffOf(sellerId);
+    }
+
+    match /members/{memberId} {
+      // الموظف يقرأ عضويته ببريده، وصاحب المتجر يقرأ فهرس موظفيه
+      allow read: if request.auth != null
+                  && (myEmail() == memberId || request.auth.uid in resource.data.sellerIds);
+      // صاحب المتجر فقط ينشئ/يحدّث/يحذف الفهرس
+      allow create, update: if request.auth != null && request.auth.uid in request.resource.data.sellerIds;
+      allow delete: if request.auth != null && request.auth.uid in resource.data.sellerIds;
+    }
+
     match /sellers/{sellerId} {
       allow read: if true;
       allow write: if isOwner(sellerId) || isAdmin();
@@ -33,42 +65,42 @@ service cloud.firestore {
 
     match /products/{productId} {
       allow read: if true;
-      allow create: if request.auth != null && request.resource.data.sellerId == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.sellerId == request.auth.uid;
+      allow create: if request.auth != null && canManage(request.resource.data.sellerId);
+      allow update, delete: if request.auth != null && canManage(resource.data.sellerId);
     }
 
     match /orders/{orderId} {
       allow create: if true;
-      allow read: if (request.auth != null && request.auth.uid in resource.data.sellerIds) || isAdmin();
-      allow update: if (request.auth != null && request.auth.uid in resource.data.sellerIds) || isAdmin();
+      allow read, update: if (request.auth != null && request.auth.uid in resource.data.sellerIds)
+                          || isStaffOfAny(resource.data.sellerIds) || isAdmin();
     }
 
-    // الموظفون — خاصة بصاحب المتجر وحده
+    // الموظفون — الإدارة الكاملة لصاحب المتجر وحده
     match /staff/{staffId} {
       allow read, update, delete: if request.auth != null && resource.data.sellerId == request.auth.uid;
       allow create: if request.auth != null && request.resource.data.sellerId == request.auth.uid;
     }
 
-    // القائمة السوداء — البائع يديرها، والزبون يحتاج قراءة للتحقق عند الطلب
+    // القائمة السوداء — البائع/موظفه يديرها، والزبون يحتاج قراءة للتحقق عند الطلب
     match /blacklist/{itemId} {
       allow read: if true;
-      allow create: if request.auth != null && request.resource.data.sellerId == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.sellerId == request.auth.uid;
+      allow create: if request.auth != null && canManage(request.resource.data.sellerId);
+      allow update, delete: if request.auth != null && canManage(resource.data.sellerId);
     }
 
-    // الكوبونات — قراءة عامة للتحقق، وتعديل لصاحب المتجر
+    // الكوبونات — قراءة عامة للتحقق، وتعديل لصاحب المتجر/موظفه
     // (update مسموح للزبون لتحديث عدّاد الاستعمال فقط)
     match /coupons/{couponId} {
       allow read: if true;
-      allow create, delete: if request.auth != null && request.resource.data.sellerId == request.auth.uid;
-      allow update: if (request.auth != null && resource.data.sellerId == request.auth.uid)
+      allow create, delete: if request.auth != null && canManage(request.resource.data.sellerId);
+      allow update: if (request.auth != null && canManage(resource.data.sellerId))
                     || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used']);
     }
 
-    // محاولات الطلب من أرقام محظورة (ينشئها الزبون، يقرأها التاجر)
+    // محاولات الطلب من أرقام محظورة (ينشئها الزبون، يقرأها التاجر/موظفه)
     match /blacklist_attempts/{attemptId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null && resource.data.sellerId == request.auth.uid;
+      allow read, update, delete: if request.auth != null && canManage(resource.data.sellerId);
     }
 
     // عدّاد الزيارات
@@ -81,6 +113,14 @@ service cloud.firestore {
 ```
 
 هذه القواعد تسمح لأي زائر بقراءة المنتجات والمتاجر (حتى يظهر المتجر للجميع)، لكنها تمنع أي شخص من تعديل منتجات ليست له، ومن قراءة طلبات ليست متعلقة بمتجره.
+
+> 🔄 **مهم — إن كنت إصداراً سابقاً:** إذا كانت متاجرك تعمل من قبل، **أعد نسخ القواعد أعلاه والصقها في Firebase console → Firestore → Rules ثم Publish**، لأنها أضافت مجموعة `members` (فهرس عضوية الموظفين) المطلوبة حتى يقدر الموظف يدخل ويرى متجر فريق العمل بصلاحياته.
+
+### كيف يعمل فريق العمل الآن؟
+1. صاحب المتجر يضيف موظفاً ببريده من **لوحة التحكم → فريق العمل** (يُنشأ تلقائياً فهرس عضوية `members/{email}`).
+2. الموظف يسجّل حساباً عادياً ببريده (أو يستعمل حسابه) ثم يدخل من صفحة الدخول.
+3. عند الدخول يتعرّف النظام عليه تلقائياً كموظف، ويدخله إلى **متجر صاحب العمل** بواجهة مخصّصة تعرض فقط الأقسام التي مُنحت له صلاحيتها (الطلبات، المنتجات، الكوبونات، القائمة السوداء، الإحصائيات).
+4. إذا كان الموظف يملك متجراً خاصاً أيضاً، يظهر له زرّ **«فتح متجري الخاص»** في الأعلى، وزرّ **«الدخول كموظف»** عند فتح متجره.
 
 6. من القائمة الجانبية اذهب لإعدادات المشروع (⚙️ **Project settings**) → في تبويب **General** انزل لقسم **Your apps** → اضغط أيقونة **Web (</>)** لإنشاء تطبيق ويب → أعطه اسماً واضغط **Register app**.
 7. ستظهر لك بيانات `firebaseConfig` — انسخها والصقها في ملف `js/firebase-config.js` داخل المشروع، مكان الأسطر التي تبدأ بـ "ضع...".

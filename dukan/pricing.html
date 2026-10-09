@@ -48,7 +48,12 @@
   const user = await Auth.waitForAuthReady();
   if (!user) { window.location.href = "login.html"; return; }
   const seller = await DB.getSellerById(user.uid);
-  if (!seller) { window.location.href = "login.html"; return; }
+  if (!seller) {
+    // قد يكون موظفاً في متجر غيره — لا اشتراك خاص به
+    const session = await DB.resolveSession();
+    window.location.href = session && session.isStaff ? "dashboard.html" : "login.html";
+    return;
+  }
 
   if (new URLSearchParams(location.search).get("expired") === "1") {
     document.getElementById("expiredNotice").classList.remove("hidden");
