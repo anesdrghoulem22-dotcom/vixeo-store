@@ -222,6 +222,11 @@ body {
   padding: .7rem .9rem;
   font-size: .88rem;
 }
+.auth-ok {
+  background: #E7F4EC;
+  color: #1F7A4D;
+  border-color: #BEE3CD;
+}
 
 /* ---------- Pricing ---------- */
 .plan-card {

@@ -158,10 +158,16 @@ export const Features = (() => {
       const btn = e.target.querySelector("button[type=submit]");
       btn.disabled = true;
       try {
+        const staffEmail = (fd.get("email") || "").trim().toLowerCase();
+        const emailCheck = Auth.validateEmail(staffEmail);
+        if (!emailCheck.ok) {
+          btn.disabled = false;
+          return toast(emailCheck.message, true);
+        }
         await DB.addStaff({
           sellerId: seller.id,
           name: (fd.get("name") || "").trim(),
-          email: (fd.get("email") || "").trim().toLowerCase(),
+          email: staffEmail,
           phone: (fd.get("phone") || "").trim(),
           permissions,
           active: true,

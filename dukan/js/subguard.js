@@ -97,6 +97,12 @@ export const SubGuard = (() => {
       return null;
     }
 
+    // حساب جديد لم يؤكّد بريده بعد → صفحة تأكيد البريد
+    if (Auth.emailNeedsVerification(user, session.ownSeller)) {
+      window.location.href = "verify-email.html";
+      return null;
+    }
+
     // تفضيل الدور (يخزّنه المستخدم عند التبديل بين متجره وفريق العمل)
     const role = localStorage.getItem("dukan_role_" + user.uid);
 
