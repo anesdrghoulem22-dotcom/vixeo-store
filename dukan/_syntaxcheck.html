@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>check2</title></head>
+<body>
+<pre id="result">running…</pre>
+<script>
+window.addEventListener("error", (ev) => {
+  const el = document.getElementById("result");
+  if (el && el.dataset.done !== "1") {
+    el.textContent = "JS_ERROR: " + ev.message + " | line " + ev.lineno + " col " + ev.colno;
+    el.dataset.done = "1";
+  }
+});
+(async () => {
+  const res = document.getElementById("result");
+  try {
+    const txt = await (await fetch("js/admin.js")).text();
+    const code = txt
+      .replace(/^import[\s\S]*?from\s*["'][^"']+["'];?/gm, (m) => "\n".repeat((m.match(/\n/g) || []).length))
+      .replace("export const Admin", "const Admin");
+    const blob = new Blob([code], { type: "text/javascript" });
+    const url = URL.createObjectURL(blob);
+    const s = document.createElement("script");
+    s.type = "module";
+    s.src = url;
+    document.body.appendChild(s);
+    setTimeout(() => {
+      if (res.dataset.done !== "1") { res.dataset.done = "1"; res.textContent = "JS_SYNTAX_OK (line numbers preserved)"; }
+    }, 2500);
+  } catch (e) { res.textContent = "JS_FETCH_ERROR: " + e.message; }
+})();
+</script>
+</body></html>
