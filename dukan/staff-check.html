@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فحص فريق العمل — دكان</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="img/logo.svg">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  body { background: #F6F4EF; }
+  .chk-card { background:#fff; border:1px solid #E7E2D8; border-radius:14px; padding:1rem 1.1rem; margin-bottom:.8rem; }
+  .chk-label { font-size:.78rem; color:#7A7266; font-weight:700; margin-bottom:.25rem; }
+  .chk-val { font-weight:800; word-break:break-all; line-height:1.7; }
+  .ok { color:#1B7A63; } .bad { color:#C0392B; } .neutral { color:#2B2B2B; }
+  .chk-code { font-family: ui-monospace, Consolas, monospace; font-size:.8rem; background:#F1EEE7; border-radius:8px; padding:.5rem .6rem; white-space:pre-wrap; }
+</style>
+</head>
+<body>
+<div class="max-w-2xl mx-auto p-5">
+  <a href="dashboard.html" class="inline-flex items-center gap-2 mb-5">
+    <img class="brand-mark" src="img/logo.svg" alt="دكان" width="40" height="40">
+    <span class="font-display text-lg">دكان</span>
+  </a>
+  <h1 class="font-display text-2xl mb-1">🔎 فحص وضع الموظف</h1>
+  <p class="text-sm text-gray-500 mb-6">افتح هالصفحة وأنت داخل بحساب <strong>الموظف</strong>. تعرضلك بالضبط واش راه صاري خطوة بخطوة.</p>
+  <div id="out"></div>
+  <div class="chk-card">
+    <div class="chk-label">ملاحظة</div>
+    <div class="chk-val neutral" style="font-size:.85rem">
+      لازم ترفع هالملف مع باقي ملفات الموقع، وتفتحو من نفس رابط الموقع (ماشي من الملف مباشرة).
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { Auth } from "./js/auth.js";
+import { DB } from "./js/db.js";
+
+const out = document.getElementById("out");
+function row(label, value, state) {
+  const cls = state === true ? "ok" : state === false ? "bad" : "neutral";
+  const el = document.createElement("div");
+  el.className = "chk-card";
+  const l = document.createElement("div"); l.className = "chk-label"; l.textContent = label;
+  const v = document.createElement("div"); v.className = "chk-val " + cls; v.textContent = value;
+  el.appendChild(l); el.appendChild(v);
+  out.appendChild(el);
+}
+function code(label, text) {
+  const el = document.createElement("div");
+  el.className = "chk-card";
+  const l = document.createElement("div"); l.className = "chk-label"; l.textContent = label;
+  const v = document.createElement("div"); v.className = "chk-code"; v.textContent = text;
+  el.appendChild(l); el.appendChild(v);
+  out.appendChild(el);
+}
+
+(async () => {
+  try {
+    const user = await Auth.waitForAuthReady();
+    if (!user) {
+      row("حالة الدخول", "ما راكش داخل بهذا المتصفح. سجّل الدخول من login.html ثم ارجع لهنا (بنفس رابط الموقع).", false);
+      return;
+    }
+    row("1) البريد المسجّل في Firebase Auth", user.email || "(بلا بريد)", user.email ? true : false);
+    code("2) UID", user.uid);
+
+    // هل عندك متجر خاص؟
+    let seller = null, sellerErr = null;
+    try { seller = await DB.getSellerById(user.uid); } catch (e) { sellerErr = e.message; }
+    if (sellerErr) row("3) قراءة sellers/{uid}", "خطأ: " + sellerErr, false);
+    else row("3) عندك متجر خاص (sellers/{uid})؟", seller ? ("نعم — " + (seller.name || "")) : "لا", !!seller);
+
+    // فهرس العضوية
+    let member = null, memberErr = null;
+    try { member = await DB.getMyMembership(user.email || ""); } catch (e) { memberErr = e.message; }
+    if (memberErr) {
+      row("4) قراءة فهرس العضوية members/{email}", "❌ خطأ: " + memberErr + "  ← معناها قواعد Firestore ما تنشروش (أو فيها مشكل).", false);
+    } else {
+      row("4) موجود فهرس عضوية ببريدك؟", member ? "نعم ✓" : "لا ✗", !!member);
+      if (member) {
+        row("   • المتجر (sellerIds)", JSON.stringify(member.sellerIds || []), null);
+        row("   • نشط؟", String(member.active !== false), member.active !== false);
+        row("   • الصلاحيات", JSON.stringify(member.permissions || []), null);
+      } else {
+        code("الحل", "السبب: صاحب المتجر لازم يفتح لوحة التحكم → تبويب «فريق العمل» بآخر نسخة من الموقع،\nحتى يتولّد فهرس العضوية تلقائياً. وتأكد أن البريد في سجل الموظف يطابق بالضبط بريدك هذا:\n" + (user.email || ""));
+      }
+    }
+
+    // النتيجة النهائية
+    let session = null, sessionErr = null;
+    try { session = await DB.resolveSession(); } catch (e) { sessionErr = e.message; }
+    if (sessionErr) row("5) النتيجة النهائية", "خطأ: " + sessionErr, false);
+    else row("5) النتيجة النهائية", session && session.isStaff
+      ? "نعم — موظف ✓، يفتح لك متجر: " + (session.teamSeller?.name || "")
+      : "لا — النظام ما تعرّفش عليك كموظف ✗", !!(session && session.isStaff));
+  } catch (e) {
+    code("خطأ غير متوقع", (e && (e.stack || e.message)) || String(e));
+  }
+})();
+</script>
+</body>
+</html>
