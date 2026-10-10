@@ -15,16 +15,22 @@
   ],
   "firestore": {
     "database": "(default)",
-    "location": "nam5",
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "public": "public",
+    "public": ".",
     "ignore": [
       "firebase.json",
+      ".firebaserc",
       "**/.*",
-      "**/node_modules/**"
+      "**/node_modules/**",
+      "functions/**",
+      "scripts/**",
+      "public/**",
+      "README.md",
+      "firestore.rules",
+      "firestore.indexes.json"
     ],
     "rewrites": [
       {

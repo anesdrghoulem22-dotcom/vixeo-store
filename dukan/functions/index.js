@@ -11,9 +11,9 @@ setGlobalOptions({ region: "europe-west1" });
 const STRIPE_SECRET = process.env.STRIPE_SECRET;
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 const STRIPE_PRICE_MAP = {
-  basic: process.env.STRIPE_PRICE_BASIC || "price_1SHOupGElA4MZAzg90y7jL5f",
-  plus: process.env.STRIPE_PRICE_PLUS || "price_1SHOv8GElA4MZAzgCxoYagkA",
-  pro: process.env.STRIPE_PRICE_PRO || "price_1SHOvsGElA4MZAzg1wZhAVkZ",
+  basic: process.env.STRIPE_PRICE_BASIC || "price_1UP0DN1CWmgqSrPEglFJ0rV3",
+  plus: process.env.STRIPE_PRICE_PLUS || "price_1UP0Dy1CWmgqSrPEY7bWVkSK",
+  pro: process.env.STRIPE_PRICE_PRO || "price_1UP0F41CWmgqSrPEZvYvI4UE",
 };
 
 const stripe = STRIPE_SECRET ? require("stripe")(STRIPE_SECRET) : null;
