@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تأكيد البريد الإلكتروني — دكان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/svg+xml" href="img/logo.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="auth-shell">
+  <div class="auth-card">
+    <a href="index.html" class="flex items-center gap-3 mb-8">
+      <img class="brand-mark" src="img/logo.svg" alt="دكان" width="44" height="44">
+      <span class="font-display text-lg">دكان</span>
+    </a>
+
+    <div class="text-center mb-6">
+      <div class="text-4xl mb-3">📩</div>
+      <h1 class="font-display text-xl mb-1">تحقّق من بريدك الإلكتروني</h1>
+      <p class="text-sm text-gray-500">
+        أرسلنا رابط تأكيد إلى<br>
+        <strong id="veEmail" style="color: var(--c-primary)">…</strong>
+      </p>
+    </div>
+
+    <div id="msgBox" class="auth-error hidden mb-4"></div>
+
+    <p class="text-sm text-gray-600 mb-6" style="line-height: 1.9">
+      اضغط على رابط التأكيد داخل الرسالة لتنشيط حسابك، ثم ارجع لهذه الصفحة
+      واضغط <strong>«تحققتُ من بريدي»</strong>.
+      <br>
+      <span class="text-xs text-gray-500">لم تصلك الرسالة؟ تحقّق من مجلد «الرسائل غير المرغوب فيها (Spam)».</span>
+    </p>
+
+    <button type="button" id="checkBtn" class="btn-primary w-full mb-3">تحققتُ من بريدي — تابع</button>
+    <button type="button" id="resendBtn" class="w-full"
+      style="border:1px solid var(--c-line); border-radius:12px; padding:.75rem 1rem; font-weight:600; background:var(--c-white); cursor:pointer; color:var(--c-ink)">
+      إعادة إرسال الرابط
+    </button>
+
+    <p class="text-sm text-gray-500 mt-6 text-center">
+      <button type="button" id="logoutBtn" class="font-semibold" style="color: var(--c-primary); background:none; border:none; cursor:pointer">تسجيل الخروج</button>
+    </p>
+  </div>
+</div>
+
+<script type="module">
+  import { Auth } from "./js/auth.js";
+  import { DB } from "./js/db.js";
+
+  const emailEl = document.getElementById("veEmail");
+  const msgBox = document.getElementById("msgBox");
+  const resendBtn = document.getElementById("resendBtn");
+  const checkBtn = document.getElementById("checkBtn");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  function showMsg(text, isError = false) {
+    msgBox.textContent = text;
+    msgBox.className = "auth-error mb-4" + (isError ? "" : " auth-ok");
+    msgBox.classList.remove("hidden");
+  }
+
+  const user = await Auth.waitForAuthReady();
+  if (!user) {
+    window.location.href = "login.html";
+  } else {
+    const ownSeller = await DB.getSellerById(user.uid).catch(() => null);
+    // إن كان البريد مؤكّداً (أو حساب قديم لا يلزمه التأكيد) → لوحة التحكم
+    if (user.emailVerified || !Auth.emailNeedsVerification(user, ownSeller)) {
+      window.location.href = "dashboard.html";
+    } else if (emailEl) {
+      emailEl.textContent = user.email;
+    }
+  }
+
+  function startCooldown() {
+    let left = 60;
+    resendBtn.disabled = true;
+    resendBtn.textContent = `إعادة الإرسال بعد ${left}ث`;
+    const t = setInterval(() => {
+      left -= 1;
+      if (left <= 0) {
+        clearInterval(t);
+        resendBtn.disabled = false;
+        resendBtn.textContent = "إعادة إرسال الرابط";
+      } else {
+        resendBtn.textContent = `إعادة الإرسال بعد ${left}ث`;
+      }
+    }, 1000);
+  }
+
+  resendBtn?.addEventListener("click", async () => {
+    try {
+      await Auth.resendVerificationEmail();
+      showMsg("تم إرسال رابط التحقق ✓ — تحقّق أيضاً من مجلد «الرسائل غير المرغوب فيها».");
+      startCooldown();
+    } catch (err) {
+      showMsg(err.message || "تعذّر إرسال الرابط، حاول مجدداً.", true);
+    }
+  });
+
+  checkBtn?.addEventListener("click", async () => {
+    checkBtn.disabled = true;
+    checkBtn.textContent = "جارٍ التحقق…";
+    try {
+      const ok = await Auth.refreshEmailVerification();
+      if (ok) { window.location.href = "dashboard.html"; return; }
+      showMsg("لم يتم تأكيد بريدك بعد. افتح الرابط الذي أرسلناه إليك ثم اضغط «تحققتُ من بريدي».", true);
+    } catch (err) {
+      showMsg(err.message || "تعذّر التحقق، حاول مجدداً.", true);
+    } finally {
+      checkBtn.disabled = false;
+      checkBtn.textContent = "تحققتُ من بريدي — تابع";
+    }
+  });
+
+  logoutBtn?.addEventListener("click", async () => {
+    await Auth.logout();
+    window.location.href = "login.html";
+  });
+</script>
+</body>
+</html>

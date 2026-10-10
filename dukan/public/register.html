@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>افتح متجرك — دكان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="icon" type="image/svg+xml" href="img/logo.svg">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="auth-shell">
+  <div class="auth-card">
+    <a href="index.html" class="flex items-center gap-3 mb-8">
+      <img class="brand-mark" src="img/logo.svg" alt="دكان" width="44" height="44">
+      <span class="font-display text-lg">دكان</span>
+    </a>
+    <h1 class="font-display text-xl mb-1">افتح متجرك على دكان</h1>
+    <p class="text-sm text-gray-500 mb-6">7 أيام تجريبية مجاناً، بدون أي التزام.</p>
+
+    <div id="errorBox" class="auth-error hidden mb-4"></div>
+
+    <div id="registerForm" class="space-y-4">
+      <div class="field">
+        <label>اسم المتجر</label>
+        <input type="text" id="storeName" required placeholder="مثال: متجر النخبة">
+      </div>
+      <div class="field">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="storeEmail" required placeholder="name@gmail.com">
+        <p class="text-xs text-gray-500 mt-1">استعمل بريدك الحقيقي — سنرسل إليه رابط تأكيد. لا نقبل البُرد المؤقتة أو الوهمية.</p>
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input type="password" id="storePassword" required minlength="4">
+      </div>
+      <div class="field">
+        <label>رقم واتساب المتجر (اختياري)</label>
+        <input type="tel" id="storeWhatsapp" placeholder="0558XXXXXX">
+        <p class="text-xs text-gray-500 mt-1">تصلك طلبات زبائنك مباشرة على هذا الرقم عبر واتساب. إن تركته فارغاً، ستُستخدم أرقام المنصة العامة مؤقتاً.</p>
+      </div>
+      <button type="button" id="submitBtn" class="btn-primary w-full">إنشاء الحساب وبدء التجربة</button>
+    </div>
+
+    <p class="text-sm text-gray-500 mt-6 text-center">
+      لديك حساب؟ <a href="login.html" class="font-semibold" style="color: var(--c-primary)">تسجيل الدخول</a>
+    </p>
+  </div>
+</div>
+
+<script type="module">
+  import { Auth } from "./js/auth.js";
+
+  Auth.redirectIfLoggedIn();
+
+  const submitBtn = document.getElementById("submitBtn");
+  const errorBox = document.getElementById("errorBox");
+
+  submitBtn.addEventListener("click", async () => {
+    errorBox.classList.add("hidden");
+    
+    const name = document.getElementById("storeName").value.trim();
+    const email = document.getElementById("storeEmail").value.trim();
+    const password = document.getElementById("storePassword").value.trim();
+    const whatsapp = document.getElementById("storeWhatsapp").value.trim();
+
+    if (!name || !email || !password) {
+      errorBox.textContent = "الرجاء ملء جميع الحقول الإجبارية.";
+      errorBox.classList.remove("hidden");
+      return;
+    }
+
+    // تحقق مبكر من البريد (صيغة + منع البُرد الوهمية/المؤقتة)
+    const emailCheck = Auth.validateEmail(email);
+    if (!emailCheck.ok) {
+      errorBox.textContent = emailCheck.message;
+      errorBox.classList.remove("hidden");
+      return;
+    }
+
+    try {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "جاري إنشاء الحساب...";
+      
+      await Auth.register({ name, email, password, whatsapp });
+      window.location.href = "verify-email.html";
+    } catch (err) {
+      errorBox.textContent = err.message;
+      errorBox.classList.remove("hidden");
+      submitBtn.disabled = false;
+      submitBtn.textContent = "إنشاء الحساب وبدء التجربة";
+    }
+  });
+</script>
+</body>
+</html>
