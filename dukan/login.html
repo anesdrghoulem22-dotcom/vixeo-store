@@ -18,35 +18,38 @@
       <img class="brand-mark" src="img/logo.svg" alt="دكان" width="44" height="44">
       <span class="font-display text-lg">دكان</span>
     </a>
-    <h1 class="font-display text-xl mb-1">تسجيل دخول البائعين</h1>
-    <p class="text-sm text-gray-500 mb-6">أدر متجرك وتابع طلباتك من لوحة التحكم.</p>
+    <span data-lang-switch class="auth-switch-pos"></span>
+    <h1 class="font-display text-xl mb-1" data-i18n="تسجيل دخول البائعين">تسجيل دخول البائعين</h1>
+    <p class="text-sm text-gray-500 mb-6" data-i18n="أدر متجرك وتابع طلباتك من لوحة التحكم.">أدر متجرك وتابع طلباتك من لوحة التحكم.</p>
 
     <div id="errorBox" class="auth-error hidden mb-4"></div>
 
     <form id="loginForm" class="space-y-4">
       <div class="field">
-        <label>البريد الإلكتروني</label>
+        <label data-i18n="البريد الإلكتروني">البريد الإلكتروني</label>
         <input type="email" name="email" required>
       </div>
       <div class="field">
-        <label>كلمة المرور</label>
+        <label data-i18n="كلمة المرور">كلمة المرور</label>
         <input type="password" name="password" required>
       </div>
       <label class="flex items-center gap-2 text-sm" style="cursor:pointer">
         <input type="checkbox" name="remember" id="rememberMe" checked style="width:16px;height:16px">
-        تذكّرني
+        <span data-i18n="تذكّرني">تذكّرني</span>
       </label>
-      <button type="submit" class="btn-primary w-full">دخول</button>
+      <button type="submit" class="btn-primary w-full" data-i18n="دخول">دخول</button>
     </form>
 
     <p class="text-sm text-gray-500 mt-6 text-center">
-      ليس لديك حساب؟ <a href="register.html" class="font-semibold" style="color: var(--c-primary)">سجّل متجرك الآن</a>
+      <span data-i18n="ليس لديك حساب؟">ليس لديك حساب؟</span> <a href="register.html" class="font-semibold" style="color: var(--c-primary)" data-i18n="سجّل متجرك الآن">سجّل متجرك الآن</a>
     </p>
   </div>
 </div>
 
+<script type="module" src="js/i18n.js"></script>
 <script type="module">
   import { Auth } from "./js/auth.js";
+  import { I18n } from "./js/i18n.js";
 
   Auth.redirectIfLoggedIn();
 
@@ -58,7 +61,7 @@
     errorBox.classList.add("hidden");
     const submitBtn = form.querySelector("button[type=submit]");
     submitBtn.disabled = true;
-    submitBtn.textContent = "جارٍ الدخول…";
+    submitBtn.textContent = I18n.t("جارٍ الدخول…");
     const fd = new FormData(form);
     try {
       await Auth.login({
@@ -71,7 +74,7 @@
       errorBox.textContent = err.message;
       errorBox.classList.remove("hidden");
       submitBtn.disabled = false;
-      submitBtn.textContent = "دخول";
+      submitBtn.textContent = I18n.t("دخول");
     }
   });
 </script>

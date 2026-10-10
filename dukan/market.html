@@ -19,13 +19,14 @@
       <span class="font-display text-lg">دكان</span>
     </a>
     <nav class="hidden md:flex items-center gap-6 text-sm">
-      <a href="market.html" class="nav-link">المتجر</a>
-      <a href="register.html" class="nav-link">بيع منتجاتك معنا</a>
+      <a href="market.html" class="nav-link" data-i18n="المتجر">المتجر</a>
+      <a href="register.html" class="nav-link" data-i18n="بيع منتجاتك معنا">بيع منتجاتك معنا</a>
     </nav>
     <div class="flex items-center gap-3">
-      <a href="login.html" class="nav-link text-sm hidden sm:inline">دخول البائعين</a>
+      <span data-lang-switch></span>
+      <a href="login.html" class="nav-link text-sm hidden sm:inline" data-i18n="دخول البائعين">دخول البائعين</a>
       <a href="cart.html" class="cart-fab">
-        🛒 <span>السلة</span>
+        🛒 <span data-i18n="السلة">السلة</span>
         <span class="cart-badge hidden" data-cart-badge>0</span>
       </a>
     </div>
@@ -34,16 +35,16 @@
 
 <section class="hero py-16 md:py-24">
   <div class="max-w-6xl mx-auto px-5">
-    <span class="hero-kicker" style="border-color: rgba(14,107,92,.22); background: rgba(14,107,92,.07); color: var(--c-primary-dark); box-shadow: none;" data-reveal>✦ منتجات حقيقية، من بائعين حقيقيين</span>
-    <h1 class="font-display text-3xl md:text-5xl mt-5 max-w-2xl leading-tight hero-title-light" data-reveal style="--rd:.08s">
+    <span class="hero-kicker" style="border-color: rgba(14,107,92,.22); background: rgba(14,107,92,.07); color: var(--c-primary-dark); box-shadow: none;" data-reveal data-i18n="✦ منتجات حقيقية، من بائعين حقيقيين">✦ منتجات حقيقية، من بائعين حقيقيين</span>
+    <h1 class="font-display text-3xl md:text-5xl mt-5 max-w-2xl leading-tight hero-title-light" data-reveal style="--rd:.08s" data-i18n="من الأزياء للإلكترونيات، كل ما تحتاجه في مكان واحد">
       من الأزياء للإلكترونيات، كل ما تحتاجه في مكان واحد
     </h1>
-    <p class="mt-5 max-w-xl text-gray-600" data-reveal style="--rd:.16s">
+    <p class="mt-5 max-w-xl text-gray-600" data-reveal style="--rd:.16s" data-i18n="تصفح، قارن، واطلب ما يعجبك خلال دقائق — منتجات من بائعين حقيقيين على المنصة.">
       تصفح، قارن، واطلب ما يعجبك خلال دقائق — منتجات من بائعين حقيقيين على المنصة.
     </p>
     <div class="hero-search flex items-center gap-3 mt-8 max-w-xl px-4 py-3" data-reveal style="--rd:.24s">
       <span>🔍</span>
-      <input id="searchInput" type="text" placeholder="ابحث عن منتج، مثال: حذاء رياضي، ساعة يد…">
+      <input id="searchInput" type="text" data-i18n-ph="ابحث عن منتج، مثال: حذاء رياضي، ساعة يد…" placeholder="ابحث عن منتج، مثال: حذاء رياضي، ساعة يد…">
     </div>
   </div>
 </section>
@@ -62,12 +63,13 @@
       <img class="brand-mark" src="img/logo.svg" alt="دكان" width="40" height="40">
       <span class="font-display text-base" style="color:#fff">دكان</span>
     </a>
-    <p>© دكان — مشروع تجريبي يعمل بالكامل داخل المتصفح (بدون خادم).</p>
-    <a href="register.html" class="nav-link">هل أنت بائع؟ افتح متجرك الآن</a>
+    <p data-i18n="© دكان — مشروع تجريبي يعمل بالكامل داخل المتصفح (بدون خادم).">© دكان — مشروع تجريبي يعمل بالكامل داخل المتصفح (بدون خادم).</p>
+    <a href="register.html" class="nav-link" data-i18n="هل أنت بائع؟ افتح متجرك الآن">هل أنت بائع؟ افتح متجرك الآن</a>
   </div>
 </footer>
 
 <script src="js/reveal.js" defer></script>
+<script type="module" src="js/i18n.js"></script>
 <script type="module">
   import { Store } from "./js/store.js";
   Store.initMarket();

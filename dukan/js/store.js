@@ -3,8 +3,10 @@
    ========================================================= */
 import { DB } from "./db.js";
 import { Auth } from "./auth.js";
+import { I18n } from "./i18n.js";
 
 export const Store = (() => {
+  function t(key, vars) { return I18n.t(key, vars); }
   function money(n) {
     return new Intl.NumberFormat("ar-DZ").format(n) + " د.ج";
   }
@@ -37,7 +39,7 @@ export const Store = (() => {
       : { priorityListing: false, verifiedBadge: false };
   }
   function verifiedPill() {
-    return `<span class="verified-pill" title="متجر موثّق">✓ موثّق</span>`;
+    return `<span class="verified-pill" title="${t("متجر موثّق")}">${t("✓ موثّق")}</span>`;
   }
 
   function mediaFor(p) {
@@ -46,8 +48,8 @@ export const Store = (() => {
   }
   function typeBadge(p) {
     return p.type === "physical"
-      ? `<span class="type-badge type-physical">🚚 منتج ملموس</span>`
-      : `<span class="type-badge type-digital">⚡ منتج رقمي</span>`;
+      ? `<span class="type-badge type-physical">🚚 ${t("منتج ملموس")}</span>`
+      : `<span class="type-badge type-digital">⚡ ${t("منتج رقمي")}</span>`;
   }
   function productTile(p) {
     const cat = categoryOf(p.category);
@@ -56,11 +58,11 @@ export const Store = (() => {
     <a href="product.html?id=${p.id}" class="tile group">
       <div class="tile-media" style="background: var(--tile-${p.category}, var(--c-sand))">
         ${mediaFor(p)}
-        ${discount ? `<span class="tile-badge">خصم ${discount}%</span>` : ""}
-        ${p.verified ? `<span class="tile-verified" title="متجر موثّق">✓</span>` : ""}
+        ${discount ? `<span class="tile-badge">${t("خصم")} ${discount}%</span>` : ""}
+        ${p.verified ? `<span class="tile-verified" title="${t("متجر موثّق")}">✓</span>` : ""}
       </div>
       <div class="tile-body">
-        <p class="tile-cat">${cat.label}</p>
+        <p class="tile-cat">${t(cat.label)}</p>
         <h3 class="tile-name">${escapeHtml(p.name)}</h3>
         <div class="tile-price-row">
           <span class="tile-price">${money(p.price)}</span>
@@ -182,8 +184,8 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
     let activeCategory = DB.CATEGORIES.some((c) => c.id === urlCat) ? urlCat : "all";
 
     catBar.innerHTML =
-      `<button class="chip${activeCategory === "all" ? " is-active" : ""}" data-cat="all">الكل</button>` +
-      DB.CATEGORIES.map((c) => `<button class="chip${activeCategory === c.id ? " is-active" : ""}" data-cat="${c.id}">${c.icon} ${c.label}</button>`).join("");
+      `<button class="chip${activeCategory === "all" ? " is-active" : ""}" data-cat="all">${t("الكل")}</button>` +
+      DB.CATEGORIES.map((c) => `<button class="chip${activeCategory === c.id ? " is-active" : ""}" data-cat="${c.id}">${c.icon} ${t(c.label)}</button>`).join("");
 
     loading(grid);
     let all = [];
@@ -199,7 +201,7 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
       // ترتيب: أصحاب "الظهور المبكر" أولاً، ثم الأحدث فالأحدث داخل كل مجموعة
       all.sort((a, b) => (b.priority - a.priority) || (b.createdAt - a.createdAt));
     } catch (err) {
-      grid.innerHTML = `<p class="col-span-full text-center py-16 text-red-500">تعذّر تحميل المنتجات. تأكد من إعداد Firebase بشكل صحيح (راجع README).</p>`;
+      grid.innerHTML = `<p class="col-span-full text-center py-16 text-red-500">${t("تعذّر تحميل المنتجات. تأكد من إعداد Firebase بشكل صحيح (راجع README).")}</p>`;
       console.error(err);
       return;
     }
@@ -214,8 +216,8 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
       grid.innerHTML = products.map(productTile).join("");
       emptyState.classList.toggle("hidden", products.length > 0);
       emptyState.textContent = all.length === 0
-        ? "لا توجد منتجات في المنصة بعد. البائعون يضيفون منتجاتهم قريباً — عاود الزيارة لاحقاً."
-        : "لا توجد منتجات مطابقة لبحثك.";
+        ? t("لا توجد منتجات في المنصة بعد. البائعون يضيفون منتجاتهم قريباً — عاود الزيارة لاحقاً.")
+        : t("لا توجد منتجات مطابقة لبحثك.");
     }
 
     catBar.addEventListener("click", (e) => {
@@ -237,7 +239,7 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
     const sellerId = params.get("seller");
     const wrap = document.getElementById("storeWrap");
     if (!sellerId) {
-      wrap.innerHTML = `<p class="text-center py-24 text-lg">رابط المتجر غير صالح. <a class="underline" href="market.html">تصفح كل المنتجات</a></p>`;
+      wrap.innerHTML = `<p class="text-center py-24 text-lg">${t("رابط المتجر غير صالح.")} <a class="underline" href="market.html">${t("تصفح كل المنتجات")}</a></p>`;
       return;
     }
 
@@ -245,13 +247,13 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
     try {
       seller = await DB.getSellerById(sellerId);
     } catch (err) {
-      wrap.innerHTML = `<p class="text-center py-24 text-lg text-red-500">تعذّر تحميل المتجر. تأكد من إعداد Firebase بشكل صحيح (راجع README).</p>`;
+      wrap.innerHTML = `<p class="text-center py-24 text-lg text-red-500">${t("تعذّر تحميل المتجر. تأكد من إعداد Firebase بشكل صحيح (راجع README).")}</p>`;
       console.error(err);
       return;
     }
 
     if (!seller) {
-      wrap.innerHTML = `<p class="text-center py-24 text-lg">المتجر غير موجود. <a class="underline" href="market.html">تصفح كل المنتجات</a></p>`;
+      wrap.innerHTML = `<p class="text-center py-24 text-lg">${t("المتجر غير موجود.")} <a class="underline" href="market.html">${t("تصفح كل المنتجات")}</a></p>`;
       return;
     }
 
@@ -281,7 +283,7 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
       sp.instagram ? { icon: "📷", url: `https://instagram.com/${sp.instagram.replace(/^@/, "")}` } : null,
       sp.facebook ? { icon: "📘", url: `https://facebook.com/${sp.facebook}` } : null,
       sp.tiktok ? { icon: "🎵", url: `https://tiktok.com/@${sp.tiktok.replace(/^@/, "")}` } : null,
-      seller.whatsapp ? { icon: "💬", url: waLink(seller.whatsapp, `مرحباً، عندي سؤال بخصوص متجر ${seller.name}`) } : null,
+      seller.whatsapp ? { icon: "💬", url: waLink(seller.whatsapp, t("مرحباً، عندي سؤال بخصوص متجر {name}", { name: seller.name })) } : null,
     ].filter(Boolean);
     socialsEl.innerHTML = socialLinks.map((s) => `<a href="${s.url}" target="_blank" class="social-btn">${s.icon}</a>`).join("");
 
@@ -298,8 +300,8 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
     let activeCategory = "all";
     if (usedCats.length > 1) {
       catBar.innerHTML =
-        `<button class="chip is-active" data-cat="all">الكل</button>` +
-        usedCats.map((c) => { const cat = categoryOf(c); return `<button class="chip" data-cat="${c}">${cat.icon} ${cat.label}</button>`; }).join("");
+        `<button class="chip is-active" data-cat="all">${t("الكل")}</button>` +
+        usedCats.map((c) => { const cat = categoryOf(c); return `<button class="chip" data-cat="${c}">${cat.icon} ${t(cat.label)}</button>`; }).join("");
     }
 
     function renderGrid() {
@@ -312,8 +314,8 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
       grid.innerHTML = filtered.map(productTile).join("");
       emptyState.classList.toggle("hidden", filtered.length > 0);
       emptyState.textContent = products.length === 0
-        ? "لم يضف هذا البائع أي منتج بعد."
-        : "لا توجد منتجات مطابقة لبحثك.";
+        ? t("لم يضف هذا البائع أي منتج بعد.")
+        : t("لا توجد منتجات مطابقة لبحثك.");
     }
     searchInput.addEventListener("input", renderGrid);
     catBar.addEventListener("click", (e) => {
@@ -332,7 +334,7 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
         const url = `${location.origin}${location.pathname.replace("store.html", "")}store.html?seller=${seller.id}`;
         navigator.clipboard.writeText(url).then(() => {
           const original = copyBtn.textContent;
-          copyBtn.textContent = "تم نسخ الرابط ✓";
+          copyBtn.textContent = t("تم نسخ الرابط ✓");
           setTimeout(() => (copyBtn.textContent = original), 1800);
         });
       });
@@ -344,18 +346,18 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
     updateCartBadge();
     const params = new URLSearchParams(location.search);
     const wrap = document.getElementById("productWrap");
-    loading(wrap, "جارٍ تحميل المنتج…");
+    loading(wrap, t("جارٍ تحميل المنتج…"));
 
     let product;
     try {
       product = await DB.getProductById(params.get("id"));
     } catch (err) {
-      wrap.innerHTML = `<p class="text-center py-20 text-lg text-red-500">تعذّر تحميل المنتج. تأكد من إعداد Firebase (راجع README).</p>`;
+      wrap.innerHTML = `<p class="text-center py-20 text-lg text-red-500">${t("تعذّر تحميل المنتج. تأكد من إعداد Firebase (راجع README).")}</p>`;
       console.error(err);
       return;
     }
     if (!product) {
-      wrap.innerHTML = `<p class="text-center py-20 text-lg">المنتج غير موجود. <a class="underline" href="market.html">عودة للمتجر</a></p>`;
+      wrap.innerHTML = `<p class="text-center py-20 text-lg">${t("المنتج غير موجود.")} <a class="underline" href="market.html">${t("عودة للمتجر")}</a></p>`;
       return;
     }
 
@@ -371,27 +373,27 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
     wrap.innerHTML = `
       <div class="pd-media" style="background: var(--tile-${product.category}, var(--c-sand))">
         ${product.image ? `<img src="${product.image}" alt="${escapeHtml(product.name)}" class="pd-img">` : `<span class="pd-icon">${cat.icon}</span>`}
-        ${discount ? `<span class="tile-badge">خصم ${discount}%</span>` : ""}
+        ${discount ? `<span class="tile-badge">${t("خصم")} ${discount}%</span>` : ""}
       </div>
       <div class="pd-info">
-        <p class="tile-cat">${cat.label} · <a href="store.html?seller=${product.sellerId}" class="underline">${escapeHtml(product.sellerName)}</a>${sellerVerified ? " " + verifiedPill() : ""}</p>
+        <p class="tile-cat">${t(cat.label)} · <a href="store.html?seller=${product.sellerId}" class="underline">${escapeHtml(product.sellerName)}</a>${sellerVerified ? " " + verifiedPill() : ""}</p>
         <h1 class="pd-title">${escapeHtml(product.name)}</h1>
         ${typeBadge(product)}
         <div class="tile-price-row mb-4 mt-3">
           <span class="pd-price">${money(product.price)}</span>
           ${product.oldPrice ? `<span class="tile-old-price">${money(product.oldPrice)}</span>` : ""}
         </div>
-        <p class="pd-desc">${escapeHtml(product.description || "لا يوجد وصف لهذا المنتج.")}</p>
-        <p class="pd-stock">${product.stock > 0 ? `متوفر (${product.stock} نسخة)` : "غير متوفر حالياً"}</p>
+        <p class="pd-desc">${escapeHtml(product.description || t("لا يوجد وصف لهذا المنتج."))}</p>
+        <p class="pd-stock">${product.stock > 0 ? `${t("متوفر")} (${product.stock} ${t("نسخة")})` : t("غير متوفر حالياً")}</p>
         <div class="flex items-center gap-3 mt-6">
           <div class="qty-stepper">
             <button type="button" id="qtyMinus">−</button>
             <span id="qtyValue">1</span>
             <button type="button" id="qtyPlus">+</button>
           </div>
-          <button id="addToCartBtn" class="btn-primary" ${product.stock <= 0 ? "disabled" : ""}>أضف إلى السلة</button>
+          <button id="addToCartBtn" class="btn-primary" ${product.stock <= 0 ? "disabled" : ""}>${t("أضف إلى السلة")}</button>
         </div>
-        <p id="addedMsg" class="text-sm mt-3 hidden" style="color: var(--c-primary)">تمت الإضافة إلى السلة ✓</p>
+        <p id="addedMsg" class="text-sm mt-3 hidden" style="color: var(--c-primary)">${t("تمت الإضافة إلى السلة ✓")}</p>
       </div>
     `;
 
@@ -419,7 +421,7 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
     const physicalFields = document.getElementById("physicalFields");
     const digitalNote = document.getElementById("digitalNote");
 
-    listEl.innerHTML = `<p class="text-center py-16 text-gray-400">جارٍ تحميل سلتك…</p>`;
+    listEl.innerHTML = `<p class="text-center py-16 text-gray-400">${t("جارٍ تحميل سلتك…")}</p>`;
 
     async function lines() {
       const cart = DB.getCart();
@@ -494,7 +496,7 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
           </div>
           <div class="cart-row-info">
             <h3>${escapeHtml(l.product.name)}</h3>
-            <p class="tile-cat">${money(l.product.price)} / الوحدة · ${l.product.type === "physical" ? "ملموس 🚚" : "رقمي ⚡"}</p>
+            <p class="tile-cat">${money(l.product.price)} / ${t("الوحدة")} · ${l.product.type === "physical" ? t("ملموس") + " 🚚" : t("رقمي") + " ⚡"}</p>
           </div>
           <div class="qty-stepper" data-qty>
             <button type="button" data-minus>−</button>
@@ -502,7 +504,7 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
             <button type="button" data-plus>+</button>
           </div>
           <p class="cart-row-total">${money(l.product.price * l.qty)}</p>
-          <button class="cart-row-remove" data-remove title="حذف">✕</button>
+          <button class="cart-row-remove" data-remove title="${t("حذف")}">✕</button>
         </div>`).join("");
 
       const subtotal = ls.reduce((s, l) => s + l.product.price * l.qty, 0);
@@ -513,21 +515,21 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
         <div class="coupon-box">
           ${appliedCoupon ? `
             <div class="coupon-applied">
-              <span>🎟️ الكوبون <strong>${escapeHtml(appliedCoupon.coupon.code)}</strong> مطبّق</span>
-              <button type="button" id="removeCouponBtn" class="coupon-remove">إزالة</button>
+              <span>${t("🎟️ الكوبون {code} مطبّق", { code: `<strong>${escapeHtml(appliedCoupon.coupon.code)}</strong>` })}</span>
+              <button type="button" id="removeCouponBtn" class="coupon-remove">${t("إزالة")}</button>
             </div>` : `
             <div class="coupon-input-row">
-              <input type="text" id="couponInput" placeholder="لديك كود خصم؟ اكتبه هنا"
+              <input type="text" id="couponInput" placeholder="${t("لديك كود خصم؟ اكتبه هنا")}"
                      style="text-transform:uppercase">
-              <button type="button" id="applyCouponBtn" class="btn-outline">تطبيق</button>
+              <button type="button" id="applyCouponBtn" class="btn-outline">${t("تطبيق")}</button>
             </div>
             <p id="couponMsg" class="coupon-msg hidden"></p>`}
         </div>
-        <div class="flex justify-between py-1"><span>عدد المنتجات</span><span>${ls.reduce((s, l) => s + l.qty, 0)}</span></div>
-        <div class="flex justify-between py-1"><span>المجموع الفرعي</span><span>${money(subtotal)}</span></div>
-        ${discount ? `<div class="flex justify-between py-1" style="color: var(--c-primary)"><span>الخصم</span><span>− ${money(discount)}</span></div>` : ""}
-        ${deliveryCost ? `<div class="flex justify-between py-1"><span>التوصيل</span><span>${money(deliveryCost)}</span></div>` : ""}
-        <div class="flex justify-between py-1 font-bold text-lg"><span>الإجمالي</span><span>${money(total)}</span></div>
+        <div class="flex justify-between py-1"><span>${t("عدد المنتجات")}</span><span>${ls.reduce((s, l) => s + l.qty, 0)}</span></div>
+        <div class="flex justify-between py-1"><span>${t("المجموع الفرعي")}</span><span>${money(subtotal)}</span></div>
+        ${discount ? `<div class="flex justify-between py-1" style="color: var(--c-primary)"><span>${t("الخصم")}</span><span>− ${money(discount)}</span></div>` : ""}
+        ${deliveryCost ? `<div class="flex justify-between py-1"><span>${t("التوصيل")}</span><span>${money(deliveryCost)}</span></div>` : ""}
+        <div class="flex justify-between py-1 font-bold text-lg"><span>${t("الإجمالي")}</span><span>${money(total)}</span></div>
       `;
 
       // تطبيق الكوبون
@@ -540,12 +542,12 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
           // الكوبون خاص بالبائع — يُطبَّق فقط إن كانت كل المنتجات من نفس المتجر
           const sellerIds = [...new Set(ls.map((l) => l.product.sellerId))];
           if (sellerIds.length > 1) {
-            msg.textContent = "أكواد الخصم تُطبَّق على منتجات متجر واحد فقط في الطلب.";
+            msg.textContent = t("أكواد الخصم تُطبَّق على منتجات متجر واحد فقط في الطلب.");
             msg.className = "coupon-msg is-error";
             return;
           }
           applyBtn.disabled = true;
-          applyBtn.textContent = "جارٍ التحقق…";
+          applyBtn.textContent = t("جارٍ التحقق…");
           try {
             const res = await DB.validateCoupon(sellerIds[0], code, subtotal);
             if (!res.valid) {
@@ -557,11 +559,11 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
             await render();
           } catch (err) {
             console.error("[applyCoupon]", err);
-            msg.textContent = "تعذّر التحقق من الكوبون — حاول مرة أخرى بعد قليل.";
+            msg.textContent = t("تعذّر التحقق من الكوبون — حاول مرة أخرى بعد قليل.");
             msg.className = "coupon-msg is-error";
           } finally {
             applyBtn.disabled = false;
-            applyBtn.textContent = "تطبيق";
+            applyBtn.textContent = t("تطبيق");
           }
         });
       }
@@ -593,7 +595,7 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
       if (ls.length === 0) return;
       const submitBtn = checkoutForm.querySelector("button[type=submit]");
       submitBtn.disabled = true;
-      submitBtn.textContent = "جارٍ إرسال الطلب…";
+      submitBtn.textContent = t("جارٍ إرسال الطلب…");
 
       const fd = new FormData(checkoutForm);
       const hasPhysical = ls.some((l) => l.product.type === "physical");
@@ -628,9 +630,9 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
               name: customer.name,
               total,
             });
-            alert("عذراً، لا يمكن إتمام هذا الطلب. يرجى التواصل مع المتجر مباشرة.");
+            alert(t("عذراً، لا يمكن إتمام هذا الطلب. يرجى التواصل مع المتجر مباشرة."));
             submitBtn.disabled = false;
-            submitBtn.textContent = "تأكيد الطلب عبر واتساب";
+            submitBtn.textContent = t("تأكيد الطلب عبر واتساب");
             return;
           }
         }
@@ -643,9 +645,9 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
         for (const sid of orderSellerIds) {
           const cap = await DB.checkOrderCap(sid);
           if (cap.capped) {
-            alert(`عذراً، هذا المتجر وصل للحد الأقصى من الطلبات المسموح بها لهذا الشهر (${cap.max} طلب). يمكنك التواصل معه مباشرة عبر واتساب.`);
+            alert(t("عذراً، هذا المتجر وصل للحد الأقصى من الطلبات المسموح بها لهذا الشهر ({max} طلب). يمكنك التواصل معه مباشرة عبر واتساب.", { max: cap.max }));
             submitBtn.disabled = false;
-            submitBtn.textContent = "تأكيد الطلب عبر واتساب";
+            submitBtn.textContent = t("تأكيد الطلب عبر واتساب");
             return;
           }
         }
@@ -671,9 +673,9 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
         orderId = await DB.addOrder(order);
       } catch (err) {
         console.error(err);
-        alert("تعذّر إرسال الطلب. تأكد من إعداد Firebase بشكل صحيح (راجع README) ثم أعد المحاولة.");
+        alert(t("تعذّر إرسال الطلب. تأكد من إعداد Firebase بشكل صحيح (راجع README) ثم أعد المحاولة."));
         submitBtn.disabled = false;
-        submitBtn.textContent = "تأكيد الطلب عبر واتساب";
+        submitBtn.textContent = t("تأكيد الطلب عبر واتساب");
         return;
       }
 
@@ -716,11 +718,11 @@ j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNo
       document.getElementById("cartPage").innerHTML = `
         <div class="success-box">
           <div class="text-5xl mb-4">✓</div>
-          <h2 class="text-2xl font-bold mb-2">تم تسجيل طلبك بنجاح</h2>
-          <p class="text-gray-600 mb-1">رقم الطلب: <span class="font-mono">${orderId}</span></p>
-          <p class="text-gray-600 mb-6">أكمل تأكيد الطلب عبر واتساب ليتواصل معك البائع.</p>
-          <a href="${link}" target="_blank" class="btn-accent">تأكيد الطلب عبر واتساب</a>
-          <div class="mt-4"><a href="market.html" class="nav-link text-sm">مواصلة التسوق</a></div>
+          <h2 class="text-2xl font-bold mb-2">${t("تم تسجيل طلبك بنجاح")}</h2>
+          <p class="text-gray-600 mb-1">${t("رقم الطلب:")} <span class="font-mono">${orderId}</span></p>
+          <p class="text-gray-600 mb-6">${t("أكمل تأكيد الطلب عبر واتساب ليتواصل معك البائع.")}</p>
+          <a href="${link}" target="_blank" class="btn-accent">${t("تأكيد الطلب عبر واتساب")}</a>
+          <div class="mt-4"><a href="market.html" class="nav-link text-sm">${t("مواصلة التسوق")}</a></div>
         </div>`;
       window.open(link, "_blank");
     });

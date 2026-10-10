@@ -18,40 +18,43 @@
       <img class="brand-mark" src="img/logo.svg" alt="دكان" width="44" height="44">
       <span class="font-display text-lg">دكان</span>
     </a>
+    <span data-lang-switch class="auth-switch-pos"></span>
 
     <div class="text-center mb-6">
       <div class="text-4xl mb-3">📩</div>
-      <h1 class="font-display text-xl mb-1">تحقّق من بريدك الإلكتروني</h1>
+      <h1 class="font-display text-xl mb-1" data-i18n="تحقّق من بريدك الإلكتروني">تحقّق من بريدك الإلكتروني</h1>
       <p class="text-sm text-gray-500">
-        أرسلنا رابط تأكيد إلى<br>
+        <span data-i18n="أرسلنا رابط تأكيد إلى">أرسلنا رابط تأكيد إلى</span><br>
         <strong id="veEmail" style="color: var(--c-primary)">…</strong>
       </p>
     </div>
 
     <div id="msgBox" class="auth-error hidden mb-4"></div>
 
-    <p class="text-sm text-gray-600 mb-6" style="line-height: 1.9">
-      اضغط على رابط التأكيد داخل الرسالة لتنشيط حسابك، ثم ارجع لهذه الصفحة
-      واضغط <strong>«تحققتُ من بريدي»</strong>.
-      <br>
-      <span class="text-xs text-gray-500">لم تصلك الرسالة؟ تحقّق من مجلد «الرسائل غير المرغوب فيها (Spam)».</span>
+    <p class="text-sm text-gray-600 mb-4" style="line-height: 1.9" data-i18n="اضغط على رابط التأكيد داخل الرسالة لتنشيط حسابك، ثم ارجع لهذه الصفحة واضغط «تحققتُ من بريدي».">
+      اضغط على رابط التأكيد داخل الرسالة لتنشيط حسابك، ثم ارجع لهذه الصفحة واضغط «تحققتُ من بريدي».
+    </p>
+    <p class="text-xs text-gray-500 mb-6" data-i18n="لم تصلك الرسالة؟ تحقّق من مجلد «الرسائل غير المرغوب فيها (Spam)».">
+      لم تصلك الرسالة؟ تحقّق من مجلد «الرسائل غير المرغوب فيها (Spam)».
     </p>
 
-    <button type="button" id="checkBtn" class="btn-primary w-full mb-3">تحققتُ من بريدي — تابع</button>
+    <button type="button" id="checkBtn" class="btn-primary w-full mb-3" data-i18n="تحققتُ من بريدي — تابع">تحققتُ من بريدي — تابع</button>
     <button type="button" id="resendBtn" class="w-full"
-      style="border:1px solid var(--c-line); border-radius:12px; padding:.75rem 1rem; font-weight:600; background:var(--c-white); cursor:pointer; color:var(--c-ink)">
+      style="border:1px solid var(--c-line); border-radius:12px; padding:.75rem 1rem; font-weight:600; background:var(--c-white); cursor:pointer; color:var(--c-ink)" data-i18n="إعادة إرسال الرابط">
       إعادة إرسال الرابط
     </button>
 
     <p class="text-sm text-gray-500 mt-6 text-center">
-      <button type="button" id="logoutBtn" class="font-semibold" style="color: var(--c-primary); background:none; border:none; cursor:pointer">تسجيل الخروج</button>
+      <button type="button" id="logoutBtn" class="font-semibold" style="color: var(--c-primary); background:none; border:none; cursor:pointer" data-i18n="تسجيل الخروج">تسجيل الخروج</button>
     </p>
   </div>
 </div>
 
+<script type="module" src="js/i18n.js"></script>
 <script type="module">
   import { Auth } from "./js/auth.js";
   import { DB } from "./js/db.js";
+  import { I18n } from "./js/i18n.js";
 
   const emailEl = document.getElementById("veEmail");
   const msgBox = document.getElementById("msgBox");
@@ -81,15 +84,15 @@
   function startCooldown() {
     let left = 60;
     resendBtn.disabled = true;
-    resendBtn.textContent = `إعادة الإرسال بعد ${left}ث`;
+    resendBtn.textContent = I18n.t("إعادة الإرسال بعد {s}ث", { s: left });
     const t = setInterval(() => {
       left -= 1;
       if (left <= 0) {
         clearInterval(t);
         resendBtn.disabled = false;
-        resendBtn.textContent = "إعادة إرسال الرابط";
+        resendBtn.textContent = I18n.t("إعادة إرسال الرابط");
       } else {
-        resendBtn.textContent = `إعادة الإرسال بعد ${left}ث`;
+        resendBtn.textContent = I18n.t("إعادة الإرسال بعد {s}ث", { s: left });
       }
     }, 1000);
   }
@@ -97,25 +100,25 @@
   resendBtn?.addEventListener("click", async () => {
     try {
       await Auth.resendVerificationEmail();
-      showMsg("تم إرسال رابط التحقق ✓ — تحقّق أيضاً من مجلد «الرسائل غير المرغوب فيها».");
+      showMsg(I18n.t("تم إرسال رابط التحقق ✓ — تحقّق أيضاً من مجلد «الرسائل غير المرغوب فيها»."));
       startCooldown();
     } catch (err) {
-      showMsg(err.message || "تعذّر إرسال الرابط، حاول مجدداً.", true);
+      showMsg(err.message || I18n.t("تعذّر إرسال الرابط، حاول مجدداً."), true);
     }
   });
 
   checkBtn?.addEventListener("click", async () => {
     checkBtn.disabled = true;
-    checkBtn.textContent = "جارٍ التحقق…";
+    checkBtn.textContent = I18n.t("جارٍ التحقق…");
     try {
       const ok = await Auth.refreshEmailVerification();
       if (ok) { window.location.href = "dashboard.html"; return; }
-      showMsg("لم يتم تأكيد بريدك بعد. افتح الرابط الذي أرسلناه إليك ثم اضغط «تحققتُ من بريدي».", true);
+      showMsg(I18n.t("لم يتم تأكيد بريدك بعد. افتح الرابط الذي أرسلناه إليك ثم اضغط «تحققتُ من بريدي»."), true);
     } catch (err) {
-      showMsg(err.message || "تعذّر التحقق، حاول مجدداً.", true);
+      showMsg(err.message || I18n.t("تعذّر التحقق، حاول مجدداً."), true);
     } finally {
       checkBtn.disabled = false;
-      checkBtn.textContent = "تحققتُ من بريدي — تابع";
+      checkBtn.textContent = I18n.t("تحققتُ من بريدي — تابع");
     }
   });
 

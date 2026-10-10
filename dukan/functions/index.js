@@ -2,6 +2,7 @@ const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https")
 const { setGlobalOptions } = require("firebase-functions/v2");
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
+const crypto = require("crypto");
 
 initializeApp();
 const db = getFirestore();
@@ -121,6 +122,145 @@ exports.stripeWebhook = onRequest(async (req, res) => {
     res.status(200).send("ok");
   } catch (err) {
     console.error("[stripeWebhook] processing error:", err);
+    res.status(500).send("error");
+  }
+});
+
+/* =========================================================
+   الدفع الجزائري الثاني: البطاقة الذهبية/CIB عبر Chargily Pay
+   ========================================================= */
+const CHARGILY_SECRET = process.env.CHARGILY_SECRET;
+const CHARGILY_MODE = process.env.CHARGILY_MODE === "live" ? "live" : "test";
+const CHARGILY_API_BASE = CHARGILY_MODE === "live"
+  ? "https://pay.chargily.net/api/v2"
+  : "https://pay.chargily.net/test/api/v2";
+const CHARGILY_AMOUNT_MAP = { basic: 1000, plus: 1500, pro: 2000 };
+const CHARGILY_WEBHOOK_URL = "https://europe-west1-dukan-store-6a9fc.cloudfunctions.net/chargilyWebhook";
+
+// تفعيل/تجديد اشتراك بائع (يستعمله Stripe وChargily معاً)
+async function activateSubscription(uid, plan, provider) {
+  const now = Date.now();
+  const sellerRef = db.collection("sellers").doc(uid);
+  const seller = await sellerRef.get();
+  if (!seller.exists) {
+    await sellerRef.set({
+      name: "بائع جديد",
+      email: null,
+      createdAt: now,
+      subscription: {
+        active: true,
+        plan,
+        start: now,
+        end: now + 30 * 24 * 60 * 60 * 1000,
+        provider,
+      },
+    });
+    return;
+  }
+  await sellerRef.update({
+    subscription: {
+      active: true,
+      plan,
+      start: now,
+      end: now + 30 * 24 * 60 * 60 * 1000,
+      provider,
+    },
+  });
+}
+
+exports.createChargilyCheckout = onCall(async (request) => {
+  if (!CHARGILY_SECRET) {
+    throw new HttpsError("failed-precondition", "بوابة الدفع Chargily غير مهيأة بعد.");
+  }
+
+  const uid = request.auth?.uid;
+  const email = request.auth?.token?.email;
+  if (!uid || !email) {
+    throw new HttpsError("unauthenticated", "يجب تسجيل الدخول أولاً.");
+  }
+
+  const plan = request.data?.plan;
+  if (!["basic", "plus", "pro"].includes(plan)) {
+    throw new HttpsError("invalid-argument", "خطة غير صالحة.");
+  }
+
+  const amount = CHARGILY_AMOUNT_MAP[plan];
+  let method = request.data?.method || "edahabia";
+  if (!["edahabia", "cib"].includes(method)) method = "edahabia";
+  const origin = request.data?.origin || "http://localhost:5500";
+
+  try {
+    const res = await fetch(`${CHARGILY_API_BASE}/checkouts`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${CHARGILY_SECRET}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount,
+        currency: "dzd",
+        payment_method: method,
+        success_url: `${origin}/success.html?plan=${plan}`,
+        failure_url: `${origin}/pricing.html?cancel=1`,
+        webhook_endpoint: CHARGILY_WEBHOOK_URL,
+        description: `اشتراك دكان — خطة ${plan}`,
+        locale: "ar",
+        metadata: { uid, plan, email },
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data?.checkout_url) {
+      console.error("[chargily.create]", res.status, JSON.stringify(data));
+      throw new HttpsError("internal", "تعذّر إنشاء جلسة الدفع عبر Chargily.");
+    }
+
+    return { url: data.checkout_url };
+  } catch (err) {
+    if (err instanceof HttpsError) throw err;
+    console.error("[createChargilyCheckout]", err);
+    throw new HttpsError("internal", "تعذّر إنشاء رابط الدفع.");
+  }
+});
+
+exports.chargilyWebhook = onRequest(async (req, res) => {
+  if (!CHARGILY_SECRET) {
+    res.status(500).send("Webhook not configured");
+    return;
+  }
+
+  const signature = req.headers["signature"];
+  const rawBody = req.rawBody ? req.rawBody.toString("utf8") : "";
+  if (!signature || !rawBody) {
+    res.status(400).send("Missing signature or body");
+    return;
+  }
+
+  // التوقيع = HMAC-SHA256 (hex) لمحتوى الطلب الخام بمفتاحك السري في Chargily
+  const computed = crypto.createHmac("sha256", CHARGILY_SECRET).update(rawBody).digest("hex");
+  const given = Buffer.from(signature);
+  const expected = Buffer.from(computed);
+  if (given.length !== expected.length || !crypto.timingSafeEqual(given, expected)) {
+    res.status(403).send("Invalid signature");
+    return;
+  }
+
+  try {
+    const event = JSON.parse(rawBody);
+    if (event.type === "checkout.paid") {
+      const checkout = event.data || {};
+      if (checkout.status === "paid") {
+        const metadata = checkout.metadata || {};
+        const uid = metadata.uid;
+        const plan = metadata.plan;
+        if (uid && ["basic", "plus", "pro"].includes(plan)) {
+          await activateSubscription(uid, plan, "chargily");
+        }
+      }
+    }
+    res.status(200).send("ok");
+  } catch (err) {
+    console.error("[chargilyWebhook] processing error:", err);
     res.status(500).send("error");
   }
 });

@@ -19,12 +19,15 @@
       <span class="font-display text-lg">دكان</span>
     </a>
     <nav class="hidden md:flex items-center gap-6 text-sm">
-      <a href="market.html" class="nav-link">كل المنتجات</a>
+      <a href="market.html" class="nav-link" data-i18n="كل المنتجات">كل المنتجات</a>
     </nav>
-    <a href="cart.html" class="cart-fab">
-      🛒 <span>السلة</span>
-      <span class="cart-badge hidden" data-cart-badge>0</span>
-    </a>
+    <div class="flex items-center gap-3">
+      <span data-lang-switch></span>
+      <a href="cart.html" class="cart-fab">
+        🛒 <span data-i18n="السلة">السلة</span>
+        <span class="cart-badge hidden" data-cart-badge>0</span>
+      </a>
+    </div>
   </div>
 </header>
 
@@ -36,10 +39,10 @@
     <div class="storefront-head-main">
       <div class="storefront-head-row">
         <div class="storefront-title-wrap">
-          <p class="storefront-kicker">✦ متجر على منصة دكان</p>
+          <p class="storefront-kicker" data-i18n="✦ متجر على منصة دكان">✦ متجر على منصة دكان</p>
           <h1 class="font-display text-2xl md:text-3xl" id="sellerStoreName">—</h1>
         </div>
-        <button id="copyStoreLinkBtn" class="btn-outline storefront-copy-btn !py-2 !px-4 text-sm">🔗 نسخ رابط المتجر</button>
+        <button id="copyStoreLinkBtn" class="btn-outline storefront-copy-btn !py-2 !px-4 text-sm" data-i18n="🔗 نسخ رابط المتجر">🔗 نسخ رابط المتجر</button>
       </div>
       <p id="sellerBio" class="storefront-bio hidden text-sm" style="max-width:60ch;line-height:1.9;margin-top:.6rem"></p>
       <div id="sellerSocials" class="storefront-socials flex gap-2" style="margin-top:.8rem"></div>
@@ -47,23 +50,23 @@
   </div>
 
   <div class="trust-strip" data-reveal>
-    <div class="trust-item"><span class="trust-icon">🚚</span> توصيل لكل الولايات</div>
-    <div class="trust-item"><span class="trust-icon">💵</span> الدفع عند الاستلام</div>
-    <div class="trust-item"><span class="trust-icon">💬</span> تواصل مباشر عبر واتساب</div>
-    <div class="trust-item"><span class="trust-icon">✓</span> منتجات موثوقة</div>
+    <div class="trust-item"><span class="trust-icon">🚚</span> <span data-i18n="توصيل لكل الولايات">توصيل لكل الولايات</span></div>
+    <div class="trust-item"><span class="trust-icon">💵</span> <span data-i18n="الدفع عند الاستلام">الدفع عند الاستلام</span></div>
+    <div class="trust-item"><span class="trust-icon">💬</span> <span data-i18n="تواصل مباشر عبر واتساب">تواصل مباشر عبر واتساب</span></div>
+    <div class="trust-item"><span class="trust-icon">✓</span> <span data-i18n="منتجات موثوقة">منتجات موثوقة</span></div>
   </div>
 
   <main class="max-w-6xl mx-auto px-5 py-10">
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-6" data-reveal>
       <div class="hero-search flex items-center gap-3 px-4 py-2.5 flex-1">
         <span>🔍</span>
-        <input id="storeSearchInput" type="text" placeholder="ابحث في منتجات هذا المتجر…">
+        <input id="storeSearchInput" type="text" data-i18n-ph="ابحث في منتجات هذا المتجر…" placeholder="ابحث في منتجات هذا المتجر…">
       </div>
     </div>
     <div id="storeCategoryBar" class="flex items-center gap-2 overflow-x-auto pb-2 mb-6"></div>
 
     <div id="sellerProductGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5"></div>
-    <p id="sellerEmptyState" class="hidden text-center py-20 text-gray-500">لم يضف هذا البائع أي منتج بعد.</p>
+    <p id="sellerEmptyState" class="hidden text-center py-20 text-gray-500" data-i18n="لم يضف هذا البائع أي منتج بعد.">لم يضف هذا البائع أي منتج بعد.</p>
   </main>
 </div>
 
@@ -73,11 +76,12 @@
       <img class="brand-mark" src="img/logo.svg" alt="دكان" width="40" height="40">
       <span class="font-display text-base" style="color:#fff">دكان</span>
     </a>
-    <p>متجر يعمل على منصة دكان — طلبات مباشرة عبر واتساب.</p>
+    <p data-i18n="متجر يعمل على منصة دكان — طلبات مباشرة عبر واتساب.">متجر يعمل على منصة دكان — طلبات مباشرة عبر واتساب.</p>
   </div>
 </footer>
 
 <script src="js/reveal.js" defer></script>
+<script type="module" src="js/i18n.js"></script>
 <script type="module">
   import { Store } from "./js/store.js";
   Store.initSellerStore();

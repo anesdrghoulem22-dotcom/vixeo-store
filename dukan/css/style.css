@@ -1750,3 +1750,88 @@ img.brand-mark:hover {
   .float-star, .landing-hero::after, .gold-text { animation: none !important; }
 }
 
+/* ---------- 18. اختيار طريقة الدفع (بريدي موب / بطاقة) ---------- */
+.pay-modal-box { max-width: 560px; }
+.pay-step { display: none; }
+.pay-step.is-active { display: block; }
+.pay-title { font-size: 1.25rem; font-weight: 800; margin-bottom: .15rem; }
+.pay-sub { color: var(--c-muted, #6b7280); font-size: .85rem; margin-bottom: 1.25rem; }
+.pay-methods { display: grid; gap: .75rem; }
+.pay-method {
+  display: flex; align-items: center; gap: 1rem;
+  width: 100%; text-align: start;
+  padding: 1.05rem 1.15rem;
+  border: 1.5px solid var(--c-line);
+  border-radius: 14px;
+  background: var(--c-white);
+  cursor: pointer;
+  transition: border-color .2s ease, box-shadow .2s ease;
+  font-family: inherit; font-size: 1rem; color: inherit;
+}
+.pay-method:hover { border-color: var(--c-primary); box-shadow: 0 10px 24px -18px rgba(14, 107, 92, .5); }
+.pay-method .pm-icon {
+  width: 46px; height: 46px; flex-shrink: 0;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  background: #eef6f3; color: var(--c-primary);
+}
+.pay-method.pm-gold .pm-icon { background: #fdf3e3; color: #b8860b; }
+.pay-method b { display: block; font-size: .98rem; }
+.pay-method small { display: block; color: var(--c-muted, #6b7280); font-size: .78rem; margin-top: .1rem; }
+.pay-method .pm-arrow { margin-inline-start: auto; color: #b6c0bb; }
+.pay-err { display: none; color: var(--c-danger, #c2410c); font-size: .85rem; margin-top: .9rem; }
+.pay-err.is-shown { display: block; }
+.wa-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
+  background: #25D366; color: #fff;
+  font-weight: 700; border-radius: 12px;
+  padding: .85rem 1.2rem; width: 100%;
+}
+.wa-btn:hover { background: #1ebe57; }
+.rib-box {
+  background: #f4f7f5;
+  border: 1.5px dashed var(--c-primary);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  margin-bottom: 1rem;
+}
+.rib-num { font-family: ui-monospace, "Courier New", monospace; font-size: 1.02rem; font-weight: 800; direction: ltr; letter-spacing: .5px; color: var(--c-primary-dark, #0a3d34); }
+.rib-copy {
+  border: 1px solid var(--c-line); background: #fff;
+  border-radius: 9px; padding: .45rem .8rem;
+  font-size: .8rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.rib-copy:hover { border-color: var(--c-primary); color: var(--c-primary); }
+.pay-note { font-size: .82rem; line-height: 1.9; color: var(--c-muted, #6b7280); }
+.pay-note b { color: var(--c-primary-dark, #0a3d34); }
+.pay-spinner {
+  display: inline-block; width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
+  border-radius: 50%; animation: pay-spin .7s linear infinite;
+  vertical-align: -3px;
+}
+@keyframes pay-spin { to { transform: rotate(360deg); } }
+button.plan-cta { border: none; cursor: pointer; }
+
+/* ---------- 19. مبدّل اللغة ---------- */
+.lang-select {
+  appearance: none; -webkit-appearance: none;
+  background: #fff;
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  padding: .4rem .9rem .4rem 1.6rem;
+  font-size: .8rem; font-weight: 700;
+  color: var(--c-primary-dark, #0a3d34);
+  cursor: pointer;
+  font-family: inherit;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23226d5c' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left .55rem center;
+}
+.lang-select:hover { border-color: var(--c-primary); }
+.auth-switch-pos {
+  position: absolute; top: 1.1rem; inset-inline-end: 1.1rem;
+}
+

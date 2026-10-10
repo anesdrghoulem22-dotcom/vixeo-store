@@ -21,6 +21,8 @@ export const Settings = (() => {
 
     document.getElementById("sellerName").textContent = seller.name;
     Dashboard.renderAvatar(seller);
+    const adminLink = document.getElementById("adminLink");
+    if (adminLink && DB.isAdminEmail(seller.email)) adminLink.classList.remove("hidden");
     document.getElementById("logoutBtn").addEventListener("click", async () => {
       await Auth.logout();
       window.location.href = "login.html";

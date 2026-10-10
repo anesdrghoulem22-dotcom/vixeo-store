@@ -18,41 +18,44 @@
       <img class="brand-mark" src="img/logo.svg" alt="دكان" width="44" height="44">
       <span class="font-display text-lg">دكان</span>
     </a>
-    <h1 class="font-display text-xl mb-1">افتح متجرك على دكان</h1>
-    <p class="text-sm text-gray-500 mb-6">7 أيام تجريبية مجاناً، بدون أي التزام.</p>
+    <span data-lang-switch class="auth-switch-pos"></span>
+    <h1 class="font-display text-xl mb-1" data-i18n="افتح متجرك على دكان">افتح متجرك على دكان</h1>
+    <p class="text-sm text-gray-500 mb-6" data-i18n="7 أيام تجريبية مجاناً، بدون أي التزام.">7 أيام تجريبية مجاناً، بدون أي التزام.</p>
 
     <div id="errorBox" class="auth-error hidden mb-4"></div>
 
     <div id="registerForm" class="space-y-4">
       <div class="field">
-        <label>اسم المتجر</label>
-        <input type="text" id="storeName" required placeholder="مثال: متجر النخبة">
+        <label data-i18n="اسم المتجر">اسم المتجر</label>
+        <input type="text" id="storeName" required data-i18n-ph="مثال: متجر النخبة" placeholder="مثال: متجر النخبة">
       </div>
       <div class="field">
-        <label>البريد الإلكتروني</label>
+        <label data-i18n="البريد الإلكتروني">البريد الإلكتروني</label>
         <input type="email" id="storeEmail" required placeholder="name@gmail.com">
-        <p class="text-xs text-gray-500 mt-1">استعمل بريدك الحقيقي — سنرسل إليه رابط تأكيد. لا نقبل البُرد المؤقتة أو الوهمية.</p>
+        <p class="text-xs text-gray-500 mt-1" data-i18n="استعمل بريدك الحقيقي — سنرسل إليه رابط تأكيد. لا نقبل البُرد المؤقتة أو الوهمية.">استعمل بريدك الحقيقي — سنرسل إليه رابط تأكيد. لا نقبل البُرد المؤقتة أو الوهمية.</p>
       </div>
       <div class="field">
-        <label>كلمة المرور</label>
+        <label data-i18n="كلمة المرور">كلمة المرور</label>
         <input type="password" id="storePassword" required minlength="4">
       </div>
       <div class="field">
-        <label>رقم واتساب المتجر (اختياري)</label>
+        <label data-i18n="رقم واتساب المتجر (اختياري)">رقم واتساب المتجر (اختياري)</label>
         <input type="tel" id="storeWhatsapp" placeholder="0558XXXXXX">
-        <p class="text-xs text-gray-500 mt-1">تصلك طلبات زبائنك مباشرة على هذا الرقم عبر واتساب. إن تركته فارغاً، ستُستخدم أرقام المنصة العامة مؤقتاً.</p>
+        <p class="text-xs text-gray-500 mt-1" data-i18n="تصلك طلبات زبائنك مباشرة على هذا الرقم عبر واتساب. إن تركته فارغاً، ستُستخدم أرقام المنصة العامة مؤقتاً.">تصلك طلبات زبائنك مباشرة على هذا الرقم عبر واتساب. إن تركته فارغاً، ستُستخدم أرقام المنصة العامة مؤقتاً.</p>
       </div>
-      <button type="button" id="submitBtn" class="btn-primary w-full">إنشاء الحساب وبدء التجربة</button>
+      <button type="button" id="submitBtn" class="btn-primary w-full" data-i18n="إنشاء الحساب وبدء التجربة">إنشاء الحساب وبدء التجربة</button>
     </div>
 
     <p class="text-sm text-gray-500 mt-6 text-center">
-      لديك حساب؟ <a href="login.html" class="font-semibold" style="color: var(--c-primary)">تسجيل الدخول</a>
+      <span data-i18n="لديك حساب؟">لديك حساب؟</span> <a href="login.html" class="font-semibold" style="color: var(--c-primary)" data-i18n="تسجيل الدخول">تسجيل الدخول</a>
     </p>
   </div>
 </div>
 
+<script type="module" src="js/i18n.js"></script>
 <script type="module">
   import { Auth } from "./js/auth.js";
+  import { I18n } from "./js/i18n.js";
 
   Auth.redirectIfLoggedIn();
 
@@ -68,7 +71,7 @@
     const whatsapp = document.getElementById("storeWhatsapp").value.trim();
 
     if (!name || !email || !password) {
-      errorBox.textContent = "الرجاء ملء جميع الحقول الإجبارية.";
+      errorBox.textContent = I18n.t("الرجاء ملء جميع الحقول الإجبارية.");
       errorBox.classList.remove("hidden");
       return;
     }
@@ -83,7 +86,7 @@
 
     try {
       submitBtn.disabled = true;
-      submitBtn.textContent = "جاري إنشاء الحساب...";
+      submitBtn.textContent = I18n.t("جاري إنشاء الحساب...");
       
       await Auth.register({ name, email, password, whatsapp });
       window.location.href = "verify-email.html";
@@ -91,7 +94,7 @@
       errorBox.textContent = err.message;
       errorBox.classList.remove("hidden");
       submitBtn.disabled = false;
-      submitBtn.textContent = "إنشاء الحساب وبدء التجربة";
+      submitBtn.textContent = I18n.t("إنشاء الحساب وبدء التجربة");
     }
   });
 </script>

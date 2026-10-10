@@ -50,12 +50,15 @@ service cloud.firestore {
     }
 
     match /members/{memberId} {
-      // الموظف يقرأ عضويته ببريده، وصاحب المتجر يقرأ فهرس موظفيه
-      allow read: if request.auth != null
-                  && (myEmail() == memberId || request.auth.uid in resource.data.sellerIds);
-      // صاحب المتجر فقط ينشئ/يحدّث/يحذف الفهرس
-      allow create, update: if request.auth != null && request.auth.uid in request.resource.data.sellerIds;
-      allow delete: if request.auth != null && request.auth.uid in resource.data.sellerIds;
+      // الموظف يقرأ عضويته ببريده، وصاحب المتجر يقرأ فهرس موظفيه، والمشرف يقرأ الكل
+      allow read: if isAdmin()
+                  || (request.auth != null
+                      && (myEmail() == memberId || request.auth.uid in resource.data.sellerIds));
+      // صاحب المتجر فقط ينشئ/يحدّث/يحذف الفهرس (والمشرف)
+      allow create, update: if isAdmin()
+                  || (request.auth != null && request.auth.uid in request.resource.data.sellerIds);
+      allow delete: if isAdmin()
+                  || (request.auth != null && request.auth.uid in resource.data.sellerIds);
     }
 
     match /sellers/{sellerId} {
@@ -65,47 +68,51 @@ service cloud.firestore {
 
     match /products/{productId} {
       allow read: if true;
-      allow create: if request.auth != null && canManage(request.resource.data.sellerId);
-      allow update, delete: if request.auth != null && canManage(resource.data.sellerId);
+      allow create: if isAdmin() || (request.auth != null && canManage(request.resource.data.sellerId));
+      allow update, delete: if isAdmin() || (request.auth != null && canManage(resource.data.sellerId));
     }
 
     match /orders/{orderId} {
       allow create: if true;
-      allow read, update: if (request.auth != null && request.auth.uid in resource.data.sellerIds)
-                          || isStaffOfAny(resource.data.sellerIds) || isAdmin();
+      allow read, update, delete: if isAdmin()
+                          || (request.auth != null && request.auth.uid in resource.data.sellerIds)
+                          || isStaffOfAny(resource.data.sellerIds);
     }
 
-    // الموظفون — الإدارة الكاملة لصاحب المتجر وحده
+    // الموظفون — الإدارة الكاملة لصاحب المتجر وحده (والمشرف)
     match /staff/{staffId} {
-      allow read, update, delete: if request.auth != null && resource.data.sellerId == request.auth.uid;
-      allow create: if request.auth != null && request.resource.data.sellerId == request.auth.uid;
+      allow read, update, delete: if isAdmin()
+                  || (request.auth != null && resource.data.sellerId == request.auth.uid);
+      allow create: if isAdmin()
+                  || (request.auth != null && request.resource.data.sellerId == request.auth.uid);
     }
 
     // القائمة السوداء — البائع/موظفه يديرها، والزبون يحتاج قراءة للتحقق عند الطلب
     match /blacklist/{itemId} {
       allow read: if true;
-      allow create: if request.auth != null && canManage(request.resource.data.sellerId);
-      allow update, delete: if request.auth != null && canManage(resource.data.sellerId);
+      allow create: if isAdmin() || (request.auth != null && canManage(request.resource.data.sellerId));
+      allow update, delete: if isAdmin() || (request.auth != null && canManage(resource.data.sellerId));
     }
 
-    // الكوبونات — قراءة عامة للتحقق، وتعديل لصاحب المتجر/موظفه
+    // الكوبونات — قراءة عامة للتحقق، وتعديل لصاحب المتجر/موظفه (والمشرف)
     // (update مسموح للزبون لتحديث عدّاد الاستعمال فقط)
     match /coupons/{couponId} {
       allow read: if true;
-      allow create, delete: if request.auth != null && canManage(request.resource.data.sellerId);
-      allow update: if (request.auth != null && canManage(resource.data.sellerId))
+      allow create, delete: if isAdmin() || (request.auth != null && canManage(request.resource.data.sellerId));
+      allow update: if isAdmin()
+                    || (request.auth != null && canManage(resource.data.sellerId))
                     || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used']);
     }
 
-    // محاولات الطلب من أرقام محظورة (ينشئها الزبون، يقرأها التاجر/موظفه)
+    // محاولات الطلب من أرقام محظورة (ينشئها الزبون، يقرأها التاجر/موظفه/المشرف)
     match /blacklist_attempts/{attemptId} {
       allow create: if true;
-      allow read, update, delete: if request.auth != null && canManage(resource.data.sellerId);
+      allow read, update, delete: if isAdmin() || (request.auth != null && canManage(resource.data.sellerId));
     }
 
     // عدّاد الزيارات
     match /visits/{visitId} {
-      allow read: if request.auth != null;
+      allow read: if isAdmin() || request.auth != null;
       allow create, update: if true;
     }
   }

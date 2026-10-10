@@ -12,18 +12,35 @@
 </head>
 <body>
 
-<div class="dash-shell grid md:grid-cols-[240px_1fr]">
+<div class="dash-shell dash-shell-v2 grid md:grid-cols-[250px_1fr]">
 
-  <aside class="dash-sidebar p-5 flex md:flex-col gap-2 md:min-h-screen">
-    <div class="hidden md:flex items-center gap-3 mb-8">
+  <aside class="dash-sidebar-v2 p-4 flex md:flex-col gap-1 md:min-h-screen md:sticky md:top-0 md:h-screen md:overflow-y-auto">
+    <div class="hidden md:flex items-center gap-3 mb-4 px-1">
       <img class="brand-mark" src="img/logo.svg" alt="دكان" width="44" height="44">
       <span class="font-display text-lg">دكان</span>
     </div>
-    <a href="dashboard.html" class="dash-tab">📦 منتجاتي</a>
-    <a href="dashboard.html" class="dash-tab">🧾 الطلبات</a>
-    <a id="viewStoreLink" href="#" class="dash-tab" target="_blank">🏬 عرض متجري</a>
-    <span class="dash-tab is-active">⚙️ إعدادات الحساب</span>
-    <button id="logoutBtn" class="dash-tab mt-auto" style="color: var(--c-danger)">↩ تسجيل الخروج</button>
+
+    <p class="sidebar-group-label">المتجر</p>
+    <a href="dashboard.html" class="dash-tab-v2"><span class="tab-icon">🏠</span> نظرة عامة</a>
+    <a href="dashboard.html" class="dash-tab-v2"><span class="tab-icon">📦</span> منتجاتي</a>
+    <a href="dashboard.html" class="dash-tab-v2"><span class="tab-icon">🧾</span> الطلبات</a>
+    <a href="dashboard.html" class="dash-tab-v2"><span class="tab-icon">🧑‍🤝‍🧑</span> العملاء</a>
+    <a href="dashboard.html" class="dash-tab-v2"><span class="tab-icon">🚚</span> التوصيل</a>
+
+    <p class="sidebar-group-label">التسويق والنمو</p>
+    <a href="dashboard.html" class="dash-tab-v2"><span class="tab-icon">📊</span> الإحصائيات</a>
+    <a href="dashboard.html" class="dash-tab-v2"><span class="tab-icon">🎟️</span> كوبونات الخصم</a>
+    <a href="dashboard.html" class="dash-tab-v2"><span class="tab-icon">📢</span> التسويق والبيكسل</a>
+
+    <p class="sidebar-group-label">الفريق والحماية</p>
+    <a href="dashboard.html" class="dash-tab-v2"><span class="tab-icon">👥</span> فريق العمل</a>
+    <a href="dashboard.html" class="dash-tab-v2"><span class="tab-icon">🚫</span> القائمة السوداء</a>
+
+    <p class="sidebar-group-label">الحساب</p>
+    <a id="viewStoreLink" href="#" class="dash-tab-v2" target="_blank"><span class="tab-icon">🏬</span> عرض متجري</a>
+    <span class="dash-tab-v2 is-active"><span class="tab-icon">⚙️</span> إعدادات الحساب</span>
+    <a href="admin.html" id="adminLink" class="dash-tab-v2 hidden"><span class="tab-icon">🛡️</span> لوحة الإدارة</a>
+    <button id="logoutBtn" class="dash-tab-v2 mt-auto" style="color:#F3A98F"><span class="tab-icon">↩</span> تسجيل الخروج</button>
   </aside>
 
   <main class="p-5 md:p-9 max-w-2xl">

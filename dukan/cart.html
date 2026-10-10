@@ -18,15 +18,18 @@
       <img class="brand-mark" src="img/logo.svg" alt="دكان" width="44" height="44">
       <span class="font-display text-lg">دكان</span>
     </a>
-    <a href="market.html" class="nav-link text-sm">متابعة التسوق</a>
+    <div class="flex items-center gap-3">
+      <span data-lang-switch></span>
+      <a href="market.html" class="nav-link text-sm" data-i18n="متابعة التسوق">متابعة التسوق</a>
+    </div>
   </div>
 </header>
 
 <main id="cartPage" class="max-w-4xl mx-auto px-5 py-10">
-  <h1 class="font-display text-2xl md:text-3xl mb-8">سلة المشتريات</h1>
+  <h1 class="font-display text-2xl md:text-3xl mb-8" data-i18n="سلة المشتريات">سلة المشتريات</h1>
 
   <div id="cartEmpty" class="hidden text-center py-20 text-gray-500">
-    سلتك فارغة حالياً. <a href="index.html" class="underline" style="color: var(--c-primary)">تصفح المنتجات</a>
+    <span data-i18n="سلتك فارغة حالياً.">سلتك فارغة حالياً.</span> <a href="index.html" class="underline" style="color: var(--c-primary)" data-i18n="تصفح المنتجات">تصفح المنتجات</a>
   </div>
 
   <div id="cartList" class="mb-8"></div>
@@ -34,47 +37,48 @@
   <div id="cartSummary" class="mb-10"></div>
 
   <section id="checkoutSection" class="hidden border-t pt-8" style="border-color: var(--c-line)">
-    <h2 class="font-display text-xl mb-5">إتمام الطلب</h2>
+    <h2 class="font-display text-xl mb-5" data-i18n="إتمام الطلب">إتمام الطلب</h2>
     <form id="checkoutForm" class="grid sm:grid-cols-2 gap-4">
       <div class="field sm:col-span-2">
-        <label>الاسم الكامل</label>
-        <input type="text" name="name" required placeholder="مثال: أحمد بن علي">
+        <label data-i18n="الاسم الكامل">الاسم الكامل</label>
+        <input type="text" name="name" required data-i18n-ph="مثال: أحمد بن علي" placeholder="مثال: أحمد بن علي">
       </div>
       <div class="field sm:col-span-2">
-        <label>رقم الهاتف</label>
+        <label data-i18n="رقم الهاتف">رقم الهاتف</label>
         <input type="tel" name="phone" required placeholder="05XXXXXXXX">
       </div>
 
-      <p id="digitalNote" class="sm:col-span-2 text-sm text-gray-500 hidden">
+      <p id="digitalNote" class="sm:col-span-2 text-sm text-gray-500 hidden" data-i18n="منتجات رقمية فقط — سيتم التسليم مباشرة بعد التواصل معك عبر واتساب، بدون حاجة لعنوان توصيل.">
         منتجات رقمية فقط — سيتم التسليم مباشرة بعد التواصل معك عبر واتساب، بدون حاجة لعنوان توصيل.
       </p>
 
       <div id="physicalFields" class="hidden sm:col-span-2 grid sm:grid-cols-2 gap-4">
         <div class="field">
-          <label>الولاية</label>
-          <select name="wilaya" id="wilayaSelect"><option value="">اختر الولاية…</option></select>
+          <label data-i18n="الولاية">الولاية</label>
+          <select name="wilaya" id="wilayaSelect"><option value="" data-i18n="اختر الولاية…">اختر الولاية…</option></select>
         </div>
         <div class="field" id="deliveryModeField">
-          <label>طريقة التوصيل</label>
+          <label data-i18n="طريقة التوصيل">طريقة التوصيل</label>
           <select name="deliveryMode" id="deliveryModeSelect">
-            <option value="home">توصيل للمنزل</option>
-            <option value="desk">توصيل لمكتب الشحن (أرخص)</option>
+            <option value="home" data-i18n="توصيل للمنزل">توصيل للمنزل</option>
+            <option value="desk" data-i18n="توصيل لمكتب الشحن (أرخص)">توصيل لمكتب الشحن (أرخص)</option>
           </select>
         </div>
         <div class="field sm:col-span-2">
-          <label>العنوان التفصيلي</label>
-          <textarea name="address" rows="3" placeholder="الحي، الشارع، أقرب علامة مميزة…"></textarea>
+          <label data-i18n="العنوان التفصيلي">العنوان التفصيلي</label>
+          <textarea name="address" rows="3" data-i18n-ph="الحي، الشارع، أقرب علامة مميزة…" placeholder="الحي، الشارع، أقرب علامة مميزة…"></textarea>
         </div>
       </div>
 
       <div class="sm:col-span-2 mt-2">
-        <button type="submit" class="btn-accent w-full">تأكيد الطلب عبر واتساب</button>
-        <p class="text-xs text-gray-500 mt-3">بعد تأكيد الطلب سيُفتح واتساب تلقائياً برسالة جاهزة بكل تفاصيل طلبك.</p>
+        <button type="submit" class="btn-accent w-full" data-i18n="تأكيد الطلب عبر واتساب">تأكيد الطلب عبر واتساب</button>
+        <p class="text-xs text-gray-500 mt-3" data-i18n="بعد تأكيد الطلب سيُفتح واتساب تلقائياً برسالة جاهزة بكل تفاصيل طلبك.">بعد تأكيد الطلب سيُفتح واتساب تلقائياً برسالة جاهزة بكل تفاصيل طلبك.</p>
       </div>
     </form>
   </section>
 </main>
 
+<script type="module" src="js/i18n.js"></script>
 <script type="module">
   import { Store } from "./js/store.js";
   Store.initCart();

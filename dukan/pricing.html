@@ -18,32 +18,100 @@
       <img class="brand-mark" src="img/logo.svg" alt="دكان" width="44" height="44">
       <span class="font-display text-lg">دكان</span>
     </a>
-    <a href="dashboard.html" class="nav-link text-sm">العودة للوحة التحكم</a>
+    <div class="flex items-center gap-3">
+      <span data-lang-switch></span>
+      <a href="dashboard.html" class="nav-link text-sm" data-i18n="العودة للوحة التحكم">العودة للوحة التحكم</a>
+    </div>
   </div>
 </header>
 
 <main class="max-w-5xl mx-auto px-5 py-14">
-  <div id="expiredNotice" class="hidden auth-error mb-8">
+  <div id="expiredNotice" class="hidden auth-error mb-8" data-i18n="انتهت فترتك التجريبية المجانية. اختر خطة اشتراك لتفعيلها والمتابعة في استخدام لوحة التحكم.">
     انتهت فترتك التجريبية المجانية. اختر خطة اشتراك لتفعيلها والمتابعة في استخدام لوحة التحكم.
+  </div>
+  <div id="cancelNotice" class="hidden auth-error mb-8" data-i18n="تم إلغاء الدفع أو لم يكتمل — لم يُخصم أي مبلغ. يمكنك إعادة المحاولة متى شئت.">
+    تم إلغاء الدفع أو لم يكتمل — لم يُخصم أي مبلغ. يمكنك إعادة المحاولة متى شئت.
   </div>
 
   <div class="text-center mb-12">
-    <h1 class="font-display text-2xl md:text-3xl mb-3">اختر خطة اشتراكك كبائع</h1>
-    <p class="text-gray-600">اشتراك شهري بسيط، بلا عمولة على مبيعاتك — كلما ارتفعت الخطة، زاد ظهور متجرك.</p>
+    <h1 class="font-display text-2xl md:text-3xl mb-3" data-i18n="اختر خطة اشتراكك كبائع">اختر خطة اشتراكك كبائع</h1>
+    <p class="text-gray-600" data-i18n="اشتراك شهري بسيط، بلا عمولة على مبيعاتك — كلما ارتفعت الخطة، زاد ظهور متجرك.">اشتراك شهري بسيط، بلا عمولة على مبيعاتك — كلما ارتفعت الخطة، زاد ظهور متجرك.</p>
   </div>
 
   <div id="plansGrid" class="grid sm:grid-cols-3 gap-5"></div>
 
-  <p class="text-center text-xs text-gray-400 mt-10">
-    الضغط على "اشترك الآن — دفع آلي" يوجهك مباشرة لصفحة الدفع الآمنة عبر Stripe.
+  <p class="text-center text-xs text-gray-400 mt-10" data-i18n="طرق الدفع المتاحة: تحويل عبر بريدي موب (تعليمات كاملة بالخطوات) أو الدفع بالبطاقة عبر Chargily Pay (البطاقة الذهبية / CIB) — يُفعَّل اشتراكك تلقائياً فور تأكيد الدفع.">
+    طرق الدفع المتاحة: تحويل عبر <b>بريدي موب</b> (تعليمات كاملة بالخطوات) أو الدفع بالبطاقة عبر <b>Chargily Pay</b> (البطاقة الذهبية / CIB) — يُفعَّل اشتراكك تلقائياً فور تأكيد الدفع.
   </p>
 </main>
 
+<!-- نافذة اختيار طريقة الدفع -->
+<div id="payModal" class="modal-overlay hidden">
+  <div class="modal-box pay-modal-box">
+
+    <!-- الخطوة 1: اختيار الطريقة -->
+    <div id="payStepMethod" class="pay-step is-active">
+      <h2 class="pay-title" data-i18n="اختر طريقة الدفع">اختر طريقة الدفع</h2>
+      <p class="pay-sub" id="payPlanLabel"></p>
+      <div class="pay-methods">
+        <button type="button" class="pay-method" id="methodBaridi">
+          <span class="pm-icon">📱</span>
+          <span><b data-i18n="بريدي موب">بريدي موب</b><small data-i18n="تحويل من حساب بريدي موب — أسرع طريقة في الجزائر">تحويل من حساب بريدي موب — أسرع طريقة في الجزائر</small></span>
+          <span class="pm-arrow">←</span>
+        </button>
+        <button type="button" class="pay-method pm-gold" id="methodCard">
+          <span class="pm-icon">💳</span>
+          <span><b data-i18n="البطاقة الذهبية / CIB">البطاقة الذهبية / CIB</b><small data-i18n="دفع آمن عبر Chargily Pay (Edahabia + CIB)">دفع آمن عبر Chargily Pay (Edahabia + CIB)</small></span>
+          <span class="pm-arrow">←</span>
+        </button>
+      </div>
+      <p class="pay-err" id="payErr"></p>
+      <p class="pay-note text-center" style="margin-top:.9rem" data-i18n="👀 بعد الاختيار سترى التعليمات الكاملة قبل إتمام الدفع.">👀 بعد الاختيار سترى التعليمات الكاملة قبل إتمام الدفع.</p>
+    </div>
+
+    <!-- الخطوة 2: تعليمات بريدي موب -->
+    <div id="payStepBaridi" class="pay-step">
+      <h2 class="pay-title" data-i18n="الدفع عبر بريدي موب">الدفع عبر بريدي موب</h2>
+      <p class="pay-sub" id="baridiPlanLabel"></p>
+
+      <div class="rib-box">
+        <div>
+          <small class="text-gray-500" data-i18n="RIB الخاص بنا للتحويل (بريدي موب)">RIB الخاص بنا للتحويل (بريدي موب)</small>
+          <div class="rib-num" id="ribValue" dir="ltr">0079 9999 0001 4713 8827</div>
+        </div>
+        <button type="button" class="rib-copy" id="ribCopyBtn" data-i18n="نسخ">نسخ</button>
+      </div>
+
+      <p class="pay-note" id="baridiSteps"></p>
+
+      <a class="wa-btn" id="baridiWaBtn" href="#" target="_blank" rel="noopener" data-i18n="📲 إرسال إثبات التحويل عبر واتساب">📲 إرسال إثبات التحويل عبر واتساب</a>
+
+      <p class="pay-note text-center" style="margin-top:.85rem" id="baridiStoreLine"></p>
+      <button type="button" class="btn-outline w-full mt-3" id="payBackBtn" data-i18n="رجوع لطرق الدفع">رجوع لطرق الدفع</button>
+    </div>
+
+    <!-- الخطوة 3: تحويل لصفحة الدفع بالبطاقة -->
+    <div id="payStepCard" class="pay-step">
+      <h2 class="pay-title" data-i18n="جارٍ تحويلك لصفحة الدفع الآمنة…">جارٍ تحويلك لصفحة الدفع الآمنة…</h2>
+      <p class="pay-sub" data-i18n="Chargily Pay — البطاقة الذهبية / CIB">Chargily Pay — البطاقة الذهبية / CIB</p>
+      <div class="text-center py-6">
+        <span class="pay-spinner"></span>
+      </div>
+      <p class="pay-note text-center" data-i18n="إذا لم تُفتح الصفحة خلال ثوانٍ، اضغط رجوع واختر الدفع عبر بريدي موب.">إذا لم تُفتح الصفحة خلال ثوانٍ، اضغط رجوع واختر الدفع عبر بريدي موب.</p>
+    </div>
+
+  </div>
+</div>
+
+<script type="module" src="js/i18n.js"></script>
 <script type="module">
   import { DB } from "./js/db.js";
   import { Auth } from "./js/auth.js";
+  import { callCreateChargilyCheckout } from "./js/firebase-config.js";
+  import { I18n } from "./js/i18n.js";
 
 (async () => {
+  const t = (k, v) => I18n.t(k, v);
   const user = await Auth.waitForAuthReady();
   if (!user) { window.location.href = "login.html"; return; }
   const seller = await DB.getSellerById(user.uid);
@@ -53,40 +121,125 @@
     return;
   }
 
-  if (new URLSearchParams(location.search).get("expired") === "1") {
-    document.getElementById("expiredNotice").classList.remove("hidden");
-  }
+  const email = seller.email || user.email || "";
+  const params = new URLSearchParams(location.search);
+  if (params.get("expired") === "1") document.getElementById("expiredNotice").classList.remove("hidden");
+  if (params.get("cancel") === "1") document.getElementById("cancelNotice").classList.remove("hidden");
 
   function money(n) { return n.toLocaleString("ar-DZ") + " د.ج"; }
+  const origin = location.origin;
+  const PLATFORM_WA = "213558593252";
+  const PLATFORM_RIB = "00799999000147138827";
 
-  // ربط معرفات الخطط بروابط الدفع المباشرة التي أنشأتها في Stripe
-  const stripeLinks = {
-    "basic": "https://buy.stripe.com/test_8x228jgZX5NT7JYdQS6g800",
-    "plus": "https://buy.stripe.com/test_7sYbIT397cchaWa1466g801",
-    "pro": "https://buy.stripe.com/test_fZu00b7pncchggu28a6g802"
-  };
+  let currentPlan = null;
+  const getPlanById = (id) => DB.PLANS.find((p) => p.id === id);
 
+  // ---------- رندر الخطط ----------
   document.getElementById("plansGrid").innerHTML = DB.PLANS.map((p) => {
     const badges = [];
-    if (p.priorityListing) badges.push(`<span class="plan-badge-pill">⭐ ظهور مبكر بين البائعين</span>`);
-    if (p.verifiedBadge) badges.push(`<span class="plan-badge-pill">✓ علامة متجر موثّق</span>`);
-    
-    const paymentUrl = stripeLinks[p.id] || "#";
+    if (p.priorityListing) badges.push(`<span class="plan-badge-pill">${t("⭐ ظهور مبكر بين البائعين")}</span>`);
+    if (p.verifiedBadge) badges.push(`<span class="plan-badge-pill">${t("✓ علامة متجر موثّق")}</span>`);
 
     return `
     <div class="plan-card${p.featured ? " is-featured" : ""}">
-      ${p.featured ? `<span class="plan-tag">${p.tagline}</span>` : ""}
-      <h2 class="font-display text-lg mb-1">${p.name}</h2>
-      ${!p.featured ? `<p class="plan-tagline">${p.tagline}</p>` : ""}
-      <p class="text-3xl font-extrabold my-3">${money(p.price)} <span class="text-base font-normal">/ شهر</span></p>
+      ${p.featured ? `<span class="plan-tag">${t(p.tagline)}</span>` : ""}
+      <h2 class="font-display text-lg mb-1">${t(p.name)}</h2>
+      ${!p.featured ? `<p class="plan-tagline">${t(p.tagline)}</p>` : ""}
+      <p class="text-3xl font-extrabold my-3">${money(p.price)} <span class="text-base font-normal">${t("/ شهر")}</span></p>
       ${badges.length ? `<div class="plan-badges">${badges.join("")}</div>` : ""}
       <ul class="text-sm text-gray-600 space-y-2 mb-6">
-        ${p.features.map((f) => `<li>✓ ${f}</li>`).join("")}
+        ${p.features.map((f) => `<li>✓ ${t(f)}</li>`).join("")}
       </ul>
-      <a href="${paymentUrl}" class="plan-cta ${p.featured ? "btn-primary" : "btn-outline"} w-full block text-center">اشترك الآن — دفع آلي</a>
+      <button type="button" data-plan="${p.id}" class="plan-cta ${p.featured ? "btn-primary" : "btn-outline"} w-full block">${t("اشترك الآن")}</button>
     </div>`;
   }).join("");
+
+  // ---------- النافذة المنبثقة ----------
+  const modal = document.getElementById("payModal");
+  const errEl = document.getElementById("payErr");
+
+  function showStep(id) {
+    document.querySelectorAll(".pay-step").forEach((s) => s.classList.remove("is-active"));
+    document.getElementById(id).classList.add("is-active");
+  }
+  function showErr(m) { errEl.textContent = m; errEl.classList.add("is-shown"); }
+  function clearErr() { errEl.classList.remove("is-shown"); errEl.textContent = ""; }
+
+  modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.add("hidden"); });
+
+  document.querySelectorAll("[data-plan]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      currentPlan = getPlanById(btn.dataset.plan);
+      if (!currentPlan) return;
+      document.getElementById("payPlanLabel").textContent =
+        t("الخطة «{name}» — {price} / شهر", { name: t(currentPlan.name), price: money(currentPlan.price) });
+      clearErr();
+      showStep("payStepMethod");
+      modal.classList.remove("hidden");
+    });
+  });
+
+  // ---------- بريدي موب ----------
+  document.getElementById("methodBaridi").addEventListener("click", () => {
+    clearErr();
+    document.getElementById("baridiPlanLabel").textContent =
+      t("الخطة «{name}» — المبلغ المطلوب تحويله: {price}", { name: t(currentPlan.name), price: money(currentPlan.price) });
+    document.getElementById("baridiSteps").innerHTML =
+      t("1️⃣ افتح تطبيق بريدي موب، وحوّل المبلغ {price} إلى الحساب أعلاه.<br>2️⃣ بعد إتمام التحويل، اضغط الزر الأخضر بالأسفل لمراسلتنا عبر واتساب.<br>3️⃣ أرفق صورة إثبات التحويل مع اسم المتجر والبريد — سنفعّل اشتراكك فور التأكيد.", { price: money(currentPlan.price) });
+
+    const storeName = (seller.name || "متجري").trim();
+    document.getElementById("baridiStoreLine").innerHTML =
+      t("👤 المتجر: {name} — 📧 {email}", { name: `<b>${storeName}</b>`, email: `<span>${email || "—"}</span>` });
+
+    const msg =
+      `السلام عليكم، أكملت التحويل لتفعيل اشتراك دكان ✔️\n` +
+      `🏪 المتجر: ${storeName}\n` +
+      `📧 البريد: ${email}\n` +
+      `📦 الخطة: ${currentPlan.name} (${currentPlan.price} د.ج/شهر)\n` +
+      `🧾 أرفق لكم صورة إثبات التحويل.`;
+    document.getElementById("baridiWaBtn").href = `https://wa.me/${PLATFORM_WA}?text=${encodeURIComponent(msg)}`;
+    showStep("payStepBaridi");
+  });
+
+  document.getElementById("ribCopyBtn").addEventListener("click", () => {
+    navigator.clipboard.writeText(PLATFORM_RIB).then(() => {
+      const b = document.getElementById("ribCopyBtn");
+      const old = b.textContent;
+      b.textContent = t("تم النسخ ✓");
+      setTimeout(() => (b.textContent = old), 1600);
+    }).catch(() => {
+      const b = document.getElementById("ribCopyBtn");
+      const old = b.textContent;
+      b.textContent = PLATFORM_RIB;
+      setTimeout(() => (b.textContent = old), 2400);
+    });
+  });
+
+  // ---------- البطاقة الذهبية / CIB عبر Chargily ----------
+  let paying = false;
+  document.getElementById("methodCard").addEventListener("click", async () => {
+    if (paying) return;
+    clearErr();
+    showStep("payStepCard");
+    paying = true;
+    try {
+      const res = await callCreateChargilyCheckout({ plan: currentPlan.id, method: "edahabia", origin });
+      if (res && res.data && res.data.url) {
+        window.location.href = res.data.url;
+        return;
+      }
+      throw new Error("Chargily لم تُرجع رابط الدفع");
+    } catch (e) {
+      console.error("[card.checkout]", e);
+      showStep("payStepMethod");
+      showErr(t("تعذّر إنشاء رابط الدفع بالبطاقة حالياً (قد تكون بوابة الدفع غير مهيأة بعد). جرّب الدفع عبر بريدي موب."));
+    } finally {
+      paying = false;
+    }
+  });
+
+  document.getElementById("payBackBtn").addEventListener("click", () => { clearErr(); showStep("payStepMethod"); });
 })();
 </script>
 </body>
-</html>l>
+</html>
